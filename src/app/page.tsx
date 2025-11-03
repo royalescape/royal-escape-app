@@ -2,99 +2,644 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import FAQSection from "@/components/FAQSection";
+
+// Removed 'next/navigation' import to fix compilation error.
+// We will use standard window.location for external navigation (pot page).
 import {
-    ShoppingCart,
-    Crown,
-    Sparkles,
-    Trophy,
-    Gift,
-    Lock,
-    Instagram,
-    Facebook,
-    MessageCircle,
-    Wallet,
-    User,
-    Menu,
-    X,
-    LogOut,
-    User as UserIcon,
-    Mail,
-    ChevronDown,
-    ChevronUp
+    Crown, Sparkles, Trophy, Instagram, Facebook, MessageCircle, Menu, X, Wallet,
+    User, ListOrdered, Link, Copy, Mail, Lock, Gift, Home, MapPin, Calendar, Globe,
+    Building, Phone, RotateCcw, Pencil, Check
 } from 'lucide-react';
 
-// --- AUTH MODAL COMPONENT (Integrated for Single-File Mandate) ---
+// --- Type Definitions ---
+type UserType = { name: string; email: string };
+type View = 'home' | 'personalInfo' | 'myOrders' | 'myWallet' | 'myReferrals';
 
+// --- Mock Utility Function ---
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// --- Sub-Components for Different Views ---
+
+/**
+ * My Referrals Component (Unchanged)
+ */
+const MyReferrals: React.FC<{ user: UserType }> = ({ user }) => {
+    const referralLink = `https://royalescape.club/join?ref=${user.name.replace(/\s/g, '-')}`;
+    const [copyText, setCopyText] = useState('Copy Link');
+
+    // Mock data for referrals
+    const mockReferrals = [
+        { name: 'Ravi Sharma', status: 'Entry Purchased', date: '2024-10-28', earnings: 50 },
+        { name: 'Priya Verma', status: 'Signed Up', date: '2024-10-25', earnings: 0 },
+        { name: 'Anil Kumar', status: 'Entry Purchased', date: '2024-09-15', earnings: 50 },
+    ];
+
+    const totalEarnings = mockReferrals.reduce((sum, ref) => sum + ref.earnings, 0);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(referralLink).then(() => {
+            setCopyText('Copied!');
+            setTimeout(() => setCopyText('Copy Link'), 1500);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            setCopyText('Error');
+            setTimeout(() => setCopyText('Copy Link'), 1500);
+        });
+    };
+
+    return (
+        <section className="max-w-4xl mx-auto py-12 px-4">
+            <h2 className="text-4xl font-bold text-white mb-8 border-b border-yellow-400/30 pb-3">
+                <Link className="inline w-8 h-8 mr-3 text-yellow-400" /> My Referrals
+            </h2>
+            <div className="space-y-8">
+                <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 className="text-2xl font-semibold text-yellow-400 mb-4 flex items-center">
+                        Your Unique Referral Link
+                    </h3>
+                    <p className="text-gray-400 mb-3">Share this link to earn **₹50** when your friends sign up and purchase their first entry!</p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <input
+                            type="text"
+                            value={referralLink}
+                            readOnly
+                            className="flex-grow p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-yellow-300 font-mono focus:outline-none focus:border-yellow-500"
+                        />
+                        <button
+                            onClick={handleCopy}
+                            className="shrink-0 px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/40 transition-all"
+                        >
+                            <Copy className="inline w-5 h-5 mr-1" /> {copyText}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                    <h3 className="text-2xl font-semibold text-white mb-4 flex justify-between items-center">
+                        Referral Summary
+                        <span className="text-lg text-yellow-400">Total Earned: ₹{totalEarnings}</span>
+                    </h3>
+                    <div className="space-y-3">
+                        {mockReferrals.length > 0 ? (
+                            mockReferrals.map((ref, index) => (
+                                <div key={index} className="flex justify-between items-center p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+                                    <div className="flex flex-col text-sm">
+                                        <span className="text-white font-medium">{ref.name}</span>
+                                        <span className="text-xs text-gray-500">Joined: {ref.date}</span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${ref.status === 'Entry Purchased' ? 'bg-green-600/30 text-green-300' : 'bg-blue-600/30 text-blue-300'}`}>
+                                            {ref.status}
+                                        </span>
+                                        {ref.earnings > 0 && (
+                                            <p className="text-sm font-bold text-green-400 mt-1">+₹{ref.earnings}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center text-gray-500 p-4">No referrals yet. Share your link to start earning!</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+
+/**
+ * My Personal Info Component (Unchanged)
+ */
+const MyPersonalInfo: React.FC<{ user: UserType }> = ({ user }) => {
+    // Mock user data state to simulate form fields (using user prop for initial values)
+    const [formData, setFormData] = useState({
+        fullName: user.name,
+        userName: '+918237219389', // Mock value
+        dob: 'DD/MM/YYYY', // Mock value
+        address: '',
+        currency: 'Indian Rupee',
+        postalCode: '',
+        country: 'India',
+        state: 'Select Region',
+        city: 'Select City',
+        email: user.email,
+        mobile: '+91 82372-19389', // Mock value
+    });
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        // Mock API call delay
+        await delay(1000);
+        setIsSaving(false);
+        setIsSaved(true);
+        // In a real app, update global user state here if needed
+        setTimeout(() => setIsSaved(false), 2000);
+    };
+
+    const handleReset = () => {
+        setFormData({
+            fullName: user.name,
+            userName: '+918237219389',
+            dob: 'DD/MM/YYYY',
+            address: '',
+            currency: 'Indian Rupee',
+            postalCode: '',
+            country: 'India',
+            state: 'Select Region',
+            city: 'Select City',
+            email: user.email,
+            mobile: '+91 82372-19389',
+        });
+    };
+
+    const inputClasses = "w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-yellow-500 transition-colors placeholder-gray-500";
+    const labelClasses = "block text-sm font-medium text-gray-400 mb-1";
+
+    return (
+        <section className="max-w-7xl mx-auto py-12 px-4">
+            <h2 className="text-4xl font-bold text-white mb-8 border-b border-yellow-400/30 pb-3">
+                <User className="inline w-8 h-8 mr-3 text-yellow-400" /> My Personal Info
+            </h2>
+            <form onSubmit={handleSave} className="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-lg">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    {/* Left Column: Avatar */}
+                    <div className="md:col-span-3 flex justify-center items-start pt-4">
+                        <div className="relative">
+                            <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center border-4 border-gray-600">
+                                <User className="w-16 h-16 text-gray-400" />
+                            </div>
+                            <button
+                                type="button"
+                                className="absolute bottom-0 right-0 p-2 bg-yellow-500 rounded-full text-black hover:bg-yellow-400 transition-colors"
+                                aria-label="Edit Profile Picture"
+                            >
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Top Fields (Full Name, Username, DOB) */}
+                    <div className="md:col-span-9 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Full Name */}
+                        <div>
+                            <label className={labelClasses} htmlFor="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} className={inputClasses} required />
+                        </div>
+                        {/* User Name */}
+                        <div>
+                            <label className={labelClasses} htmlFor="userName">User Name</label>
+                            <input type="text" id="userName" name="userName" value={formData.userName} onChange={handleChange} className={inputClasses} readOnly />
+                        </div>
+                        {/* DOB */}
+                        <div>
+                            <label className={labelClasses} htmlFor="dob">DOB</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
+                                <input type="text" id="dob" name="dob" value={formData.dob} onChange={handleChange} placeholder="DD/MM/YYYY" className={`${inputClasses} pl-10`} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Second Row (Address, Currency, Postal Code) */}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-6">
+                    {/* Address */}
+                    <div className="md:col-span-6">
+                        <label className={labelClasses} htmlFor="address">Address</label>
+                        <input type="text" id="address" name="address" value={formData.address} onChange={handleChange} placeholder="Enter Address" className={inputClasses} />
+                    </div>
+                    {/* Currency */}
+                    <div className="md:col-span-3">
+                        <label className={labelClasses} htmlFor="currency">Currency</label>
+                        <div className="relative">
+                            <select id="currency" name="currency" value={formData.currency} onChange={handleChange} className={`${inputClasses} appearance-none pr-10`}>
+                                <option>Indian Rupee</option>
+                                <option>USD</option>
+                                <option>EUR</option>
+                            </select>
+                            <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
+                        </div>
+                    </div>
+                    {/* Postal Code */}
+                    <div className="md:col-span-3">
+                        <label className={labelClasses} htmlFor="postalCode">Postal Code</label>
+                        <input type="text" id="postalCode" name="postalCode" value={formData.postalCode} onChange={handleChange} placeholder="Enter Postal Code" className={inputClasses} />
+                    </div>
+                </div>
+
+                {/* Third Row (Location and Contact Info) */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+                    {/* Country */}
+                    <div className="md:col-span-2">
+                        <label className={labelClasses} htmlFor="country">Country</label>
+                        <select id="country" name="country" value={formData.country} onChange={handleChange} className={`${inputClasses} appearance-none`}>
+                            <option>India</option>
+                            <option>USA</option>
+                        </select>
+                    </div>
+                    {/* State */}
+                    <div className="md:col-span-2">
+                        <label className={labelClasses} htmlFor="state">State</label>
+                        <select id="state" name="state" value={formData.state} onChange={handleChange} className={`${inputClasses} appearance-none`}>
+                            <option>Select Region</option>
+                            <option>Maharashtra</option>
+                            <option>Delhi</option>
+                        </select>
+                    </div>
+                    {/* City */}
+                    <div className="md:col-span-2">
+                        <label className={labelClasses} htmlFor="city">City</label>
+                        <select id="city" name="city" value={formData.city} onChange={handleChange} className={`${inputClasses} appearance-none`}>
+                            <option>Select City</option>
+                            <option>Pune</option>
+                            <option>Mumbai</option>
+                        </select>
+                    </div>
+                    {/* Email */}
+                    <div className="md:col-span-3">
+                        <label className={labelClasses} htmlFor="email">Email Address</label>
+                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className={inputClasses} readOnly />
+                    </div>
+                    {/* Mobile Number */}
+                    <div className="md:col-span-3">
+                        <label className={labelClasses} htmlFor="mobile">Mobile Number</label>
+                        <div className="flex items-center space-x-2">
+                            <input type="tel" id="mobile" name="mobile" value={formData.mobile} onChange={handleChange} className={inputClasses} readOnly />
+                            <span className="text-sm font-semibold text-green-400 border border-green-500/50 px-3 py-1 rounded-full shrink-0">VERIFIED</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Save and Reset Buttons */}
+                <div className="mt-10 flex items-center space-x-6">
+                    <button
+                        type="submit"
+                        className="flex items-center px-6 py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors disabled:opacity-50"
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            <svg className="animate-spin h-5 w-5 mr-3 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        ) : 'SAVE CHANGES'}
+                        {isSaved && !isSaving && <Check className="w-5 h-5 ml-2 text-green-700" />}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleReset}
+                        className="flex items-center text-gray-400 hover:text-yellow-500 transition-colors font-medium"
+                    >
+                        <RotateCcw className="w-5 h-5 mr-2" /> RESET
+                    </button>
+                </div>
+            </form>
+        </section>
+    );
+};
+
+/**
+ * My Dashboard Component - Comprehensive Overview (Unchanged)
+ */
+const MyDashboard: React.FC<{ user: UserType }> = ({ user }) => {
+    // Mock Data
+    const stats = {
+        activeEntries: 5,
+        totalSpent: 1245,
+        totalWinnings: 0,
+        walletBalance: 156,
+        referralEarnings: 75,
+        totalTickets: 8
+    };
+
+    const recentEntries = [
+        { id: 'RE-1001', date: '2024-10-25', pot: 'MacBook Air M3', status: 'Active', drawDate: '2024-11-15', tickets: 1 },
+        { id: 'RE-1002', date: '2024-10-20', pot: 'Gold Coin', status: 'Active', drawDate: '2024-11-10', tickets: 1 },
+        { id: 'RE-1003', date: '2024-09-01', pot: 'Luxury Staycation', status: 'Active', drawDate: '2024-11-20', tickets: 2 },
+    ];
+
+    const upcomingDraws = [
+        { pot: 'Gold Coin', drawDate: '2024-11-10', daysLeft: 8, yourTickets: 1 },
+        { pot: 'MacBook Air M3', drawDate: '2024-11-15', daysLeft: 13, yourTickets: 1 },
+        { pot: 'Luxury Staycation', drawDate: '2024-11-20', daysLeft: 18, yourTickets: 2 },
+    ];
+
+    const recentTransactions = [
+        { id: 'TXN-5001', type: 'Entry Purchase', amount: -249, date: '2024-10-25', description: 'MacBook Air M3 Entry' },
+        { id: 'TXN-5002', type: 'Referral Bonus', amount: 50, date: '2024-10-22', description: 'Friend signup bonus' },
+        { id: 'TXN-5003', type: 'Wallet Top-up', amount: 500, date: '2024-10-20', description: 'Added funds' },
+        { id: 'TXN-5004', type: 'Entry Purchase', amount: -249, date: '2024-10-20', description: 'Gold Coin Entry' },
+    ];
+
+    return (
+        <section className="max-w-7xl mx-auto py-8 px-4">
+            {/* Header */}
+            <div className="mb-8">
+                <h2 className="text-4xl font-bold text-white mb-2">
+                    <Trophy className="inline w-8 h-8 mr-3 text-yellow-400" />
+                    My Dashboard
+                </h2>
+                <p className="text-gray-400">Welcome back, {user.name.split(' ')[0]}! Here&apos;s your Royal Escape overview.</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <Trophy className="w-8 h-8 text-blue-400" />
+                        <span className="text-2xl font-bold text-blue-400">{stats.activeEntries}</span>
+                    </div>
+                    <p className="text-sm text-gray-300 font-medium">Active Entries</p>
+                    <p className="text-xs text-gray-500 mt-1">Currently in the draw</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <Wallet className="w-8 h-8 text-green-400" />
+                        <span className="text-2xl font-bold text-green-400">₹{stats.walletBalance}</span>
+                    </div>
+                    <p className="text-sm text-gray-300 font-medium">Wallet Balance</p>
+                    <p className="text-xs text-gray-500 mt-1">Available funds</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <Gift className="w-8 h-8 text-purple-400" />
+                        <span className="text-2xl font-bold text-purple-400">₹{stats.referralEarnings}</span>
+                    </div>
+                    <p className="text-sm text-gray-300 font-medium">Referral Earnings</p>
+                    <p className="text-xs text-gray-500 mt-1">From friend signups</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border border-orange-500/30 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <Sparkles className="w-8 h-8 text-orange-400" />
+                        <span className="text-2xl font-bold text-orange-400">{stats.totalTickets}</span>
+                    </div>
+                    <p className="text-sm text-gray-300 font-medium">Total Tickets</p>
+                    <p className="text-xs text-gray-500 mt-1">All-time entries</p>
+                </div>
+            </div>
+
+            {/* Financial Summary */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                        <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-red-400 text-lg">↓</span>
+                        </div>
+                        Total Expenditure
+                    </h3>
+                    <p className="text-4xl font-bold text-red-400 mb-2">₹{stats.totalSpent}</p>
+                    <p className="text-sm text-gray-400">Spent on entries & merchandise</p>
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="text-gray-400">Entry Fees</span>
+                            <span className="text-white font-semibold">₹{stats.totalSpent * 0.8}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Merchandise</span>
+                            <span className="text-white font-semibold">₹{stats.totalSpent * 0.2}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                        <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-green-400 text-lg">↑</span>
+                        </div>
+                        Total Earnings
+                    </h3>
+                    <p className="text-4xl font-bold text-green-400 mb-2">₹{stats.totalWinnings + stats.referralEarnings}</p>
+                    <p className="text-sm text-gray-400">Winnings & referral bonuses</p>
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="text-gray-400">Prize Winnings</span>
+                            <span className="text-white font-semibold">₹{stats.totalWinnings}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Referral Bonuses</span>
+                            <span className="text-white font-semibold">₹{stats.referralEarnings}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Recent Entries */}
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
+                        <span>Recent Entries</span>
+                        <Trophy className="w-5 h-5 text-yellow-400" />
+                    </h3>
+                    <div className="space-y-3">
+                        {recentEntries.map((entry) => (
+                            <div key={entry.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                        <p className="font-semibold text-white">{entry.pot}</p>
+                                        <p className="text-xs text-gray-500 font-mono">{entry.id}</p>
+                                    </div>
+                                    <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs font-bold rounded-full border border-green-500">
+                                        {entry.status}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-400">Draw: {entry.drawDate}</span>
+                                    <span className="text-yellow-400 font-semibold">{entry.tickets} ticket{entry.tickets > 1 ? 's' : ''}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Upcoming Draws */}
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
+                        <span>Upcoming Draws</span>
+                        <Sparkles className="w-5 h-5 text-yellow-400" />
+                    </h3>
+                    <div className="space-y-3">
+                        {upcomingDraws.map((draw, idx) => (
+                            <div key={idx} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                                <div className="flex justify-between items-start mb-2">
+                                    <p className="font-semibold text-white">{draw.pot}</p>
+                                    <span className="px-2 py-1 bg-yellow-400/20 text-yellow-300 text-xs font-bold rounded-full">
+                                        {draw.daysLeft} days
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-400">{draw.drawDate}</span>
+                                    <span className="text-yellow-400 font-semibold">You have {draw.yourTickets} ticket{draw.yourTickets > 1 ? 's' : ''}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Recent Transactions */}
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
+                    <span>Recent Transactions</span>
+                    <Wallet className="w-5 h-5 text-yellow-400" />
+                </h3>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-700">
+                        <thead>
+                            <tr className="text-left text-gray-400 text-xs uppercase tracking-wider">
+                                <th className="py-2 px-3">Transaction ID</th>
+                                <th className="py-2 px-3">Type</th>
+                                <th className="py-2 px-3">Description</th>
+                                <th className="py-2 px-3">Date</th>
+                                <th className="py-2 px-3 text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-700">
+                            {recentTransactions.map((txn) => (
+                                <tr key={txn.id} className="hover:bg-gray-700/30 transition-colors">
+                                    <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.id}</td>
+                                    <td className="py-3 px-3 text-sm text-white">{txn.type}</td>
+                                    <td className="py-3 px-3 text-sm text-gray-300">{txn.description}</td>
+                                    <td className="py-3 px-3 text-xs text-gray-400">{txn.date}</td>
+                                    <td className={`py-3 px-3 text-sm font-bold text-right ${txn.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                        {txn.amount > 0 ? '+' : ''}₹{Math.abs(txn.amount)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+
+// --- User Dashboard Summary Component (Unchanged) ---
+const UserDashboardSummary: React.FC<{ user: UserType, handleViewChange: (view: View) => void }> = ({ user, handleViewChange }) => {
+    // Mock Data (consistent with MyDashboard component)
+    const stats = {
+        activeEntries: 5,
+        walletBalance: 156,
+        referralEarnings: 75,
+        totalTickets: 8
+    };
+
+    return (
+        <section className="relative py-12 px-4 overflow-hidden bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-b border-gray-700">
+            <div className="max-w-7xl mx-auto relative z-10">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                    <Crown className="inline w-10 h-10 mr-3 text-yellow-400" />
+                    Welcome back, <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{user.name.split(' ')[0]}!</span>
+                </h1>
+                <p className="text-xl text-gray-400 max-w-4xl mb-8">
+                    Your Royal Escape overview at a glance. Get ready for the next draw.
+                </p>
+
+                {/* Summary Stats Grid - Added onClick and styling to each stat block */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div
+                        onClick={() => handleViewChange('myOrders')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-blue-400">{stats.activeEntries}</p>
+                        <p className="text-xs text-gray-400">Active Entries</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myWallet')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Wallet className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-green-400">₹{stats.walletBalance}</p>
+                        <p className="text-xs text-gray-400">Wallet Balance</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myReferrals')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Gift className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-purple-400">₹{stats.referralEarnings}</p>
+                        <p className="text-xs text-gray-400">Referral Earnings</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myOrders')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Sparkles className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-orange-400">{stats.totalTickets}</p>
+                        <p className="text-xs text-gray-400">Total Tickets</p>
+                    </div>
+                </div>
+
+                <div className="mt-6 text-center">
+
+                </div>
+            </div>
+        </section>
+    );
+};
+
+
+// --- Auth Modal (Unchanged) ---
 interface AuthModalProps {
     isOpen: boolean;
     onClose: () => void;
     initialMode: 'signin' | 'signup';
-    // The handler to be called when auth is successful.
-    onAuthSuccess: (user: { name: string; email: string }) => void;
+    onAuthSuccess: (user: UserType) => void;
 }
 
-// Mock delay function to simulate API latency
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onAuthSuccess }) => {
-    const [mode, setMode] = useState(initialMode); // 'signin' or 'signup'
+    const [mode, setMode] = useState(initialMode);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
 
-    // Sync mode when the modal is opened with a new initialMode prop
+    useEffect(() => { setMode(initialMode); }, [initialMode, isOpen]);
     useEffect(() => {
-        setMode(initialMode);
-    }, [initialMode, isOpen]);
-
-    // Clear form state when modal closes or mode changes
-    useEffect(() => {
-        setEmail('');
-        setPassword('');
-        setName('');
-        setError('');
+        setEmail(''); setPassword(''); setName(''); setError(''); setIsSuccess(false);
     }, [mode, isOpen]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setIsSuccess(false);
         setIsLoading(true);
 
-        // --- Mock Authentication Logic ---
-        await delay(1500); // Simulate network delay
+        await delay(1500);
 
         try {
+            let authenticatedUser: UserType;
             if (mode === 'signup') {
-                if (!email || !password || !name) {
-                    throw new Error('Please fill in all fields.');
-                }
-                if (password.length < 6) {
-                    throw new Error('Password must be at least 6 characters.');
-                }
-
-                // Mock Sign Up API call successful
-                console.log(`Mock Sign Up: User ${email} registered.`);
-                onAuthSuccess({ name: name, email: email });
-
-            } else { // 'signin'
-                if (!email || !password) {
-                    throw new Error('Please enter your email and password.');
-                }
-
-                // Mock Sign In API call successful
-                console.log(`Mock Sign In: User ${email} logged in.`);
-                const mockUserName = email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
-                onAuthSuccess({ name: mockUserName, email: email });
+                if (!email || !password || !name) { throw new Error('Please fill in all fields.'); }
+                authenticatedUser = { name: name, email: email };
+            } else {
+                if (!email || !password) { throw new Error('Please enter your email and password.'); }
+                const mockUserName = name || email.split('@')[0].split('.').join(' ').toUpperCase();
+                authenticatedUser = { name: mockUserName, email: email };
             }
-        } catch (err) {
-            // Using a simple check to handle mock error
-            const message = err instanceof Error ? err.message : 'An unexpected error occurred during authentication.';
-            setError(message);
-        } finally {
+
+            setIsSuccess(true);
             setIsLoading(false);
+            await delay(1000);
+            onAuthSuccess(authenticatedUser);
+            /* eslint-disable  @typescript-eslint/no-explicit-any */
+        } catch (err: any) {
+            setError(err.message || 'An unexpected error occurred during authentication.');
+            setIsLoading(false);
+            setIsSuccess(false);
         }
     };
 
@@ -107,140 +652,59 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
     return (
         <div
             className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 transition-opacity duration-300"
-            onClick={onClose} // Close when clicking outside the modal content
+            onClick={onClose}
         >
             <div
                 className="relative w-full max-w-lg bg-gray-900 rounded-3xl p-8 shadow-[0_0_40px_rgba(255,193,7,0.3)] border border-yellow-500/20"
-                onClick={e => e.stopPropagation()} // Prevent closing when clicking inside
+                onClick={e => e.stopPropagation()}
             >
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
-                    aria-label="Close"
-                >
-                    <X className="w-6 h-6" />
-                </button>
-
-                {/* Header */}
+                <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-yellow-400 transition-colors" aria-label="Close"> <X className="w-6 h-6" /> </button>
                 <div className="text-center mb-8">
                     <Crown className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
                     <h2 className="text-3xl font-bold text-white mb-2">{formTitle}</h2>
-                    <p className="text-gray-400 text-sm">
-                        {isSignUp
-                            ? "Join today and get your first entry to luxury rewards!"
-                            : "Welcome back, Your Majesty."
-                        }
-                    </p>
+                    <p className="text-gray-400 text-sm">{isSignUp ? "Join today and get your first entry to luxury rewards!" : "Welcome back, Your Majesty."}</p>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {isSignUp && (
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="name">Full Name</label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-                                <input
-                                    id="name"
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Enter your full name"
-                                    className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                    disabled={isLoading}
-                                    required
-                                />
+                                <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your full name" className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150" disabled={isLoading || isSuccess} required />
                             </div>
                         </div>
                     )}
-
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="email">Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-                            <input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="name@example.com"
-                                className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                disabled={isLoading}
-                                required
-                            />
+                            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150" disabled={isLoading || isSuccess} required />
                         </div>
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="password">Password</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-                            <input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                disabled={isLoading}
-                                required
-                            />
+                            <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150" disabled={isLoading || isSuccess} required />
                         </div>
-                        {!isSignUp && (
-                            <div className="text-right mt-2">
-                                <button type="button" className="text-sm text-yellow-500 hover:text-yellow-400 transition-colors">
-                                    Forgot Password?
-                                </button>
-                            </div>
-                        )}
+                        {!isSignUp && (<div className="text-right mt-2"><a href="#" className="text-sm text-yellow-500 hover:text-yellow-400 transition-colors">Forgot Password?</a></div>)}
                     </div>
 
-                    {error && (
-                        <div className="p-3 bg-red-900/50 border border-red-500 text-red-300 text-sm rounded-xl">
-                            {error}
-                        </div>
-                    )}
+                    {error && (<div className="p-3 bg-red-900/50 border border-red-500 text-red-300 text-sm rounded-xl">{error}</div>)}
+                    {isSuccess && (<div className="p-3 bg-green-900/50 border border-green-500 text-green-300 text-sm rounded-xl flex items-center gap-2"><Sparkles className="w-5 h-5" />{isSignUp ? 'Successfully signed up! Redirecting...' : 'Signed in successfully! Redirecting...'}</div>)}
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-xl shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                        {isLoading && (
-                            <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        )}
-                        {submitButtonText}
+                    <button type="submit" disabled={isLoading || isSuccess} className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-xl shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2">
+                        {isLoading && !isSuccess && (<svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>)}
+                        {isSuccess ? 'Success!' : submitButtonText}
                     </button>
                 </form>
 
-                {/* Switch Mode Link */}
                 <div className="mt-8 text-center text-gray-400">
                     {isSignUp ? (
-                        <span>
-                            Already have an account?{' '}
-                            <button
-                                type="button"
-                                onClick={() => setMode('signin')}
-                                className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors"
-                            >
-                                Sign In
-                            </button>
-                        </span>
+                        <span>Already have an account?{' '}<button onClick={() => setMode('signin')} className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors">Sign In</button></span>
                     ) : (
-                        <span>
-                            Don&apos;t have an account?{' '}
-                            <button
-                                type="button"
-                                onClick={() => setMode('signup')}
-                                className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors"
-                            >
-                                Sign Up
-                            </button>
-                        </span>
+                        <span>Don&apos;t have an account?{' '}<button onClick={() => setMode('signup')} className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors">Sign Up</button></span>
                     )}
                 </div>
             </div>
@@ -249,285 +713,270 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
 };
 
 
+// --- Main Application Component ---
+export default function RoyalEscapeHome() {
+    // Note: Removed useRouter import due to environment constraints. Using window.location.href instead.
 
-// --- MAIN PAGE COMPONENT ---
-
-export default function RoyalEscapeShop() {
-    // --- AUTHENTICATION STATE & HANDLERS ---
-    // Mock user state: null means logged out, object means logged in.
-    const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+    const [user, setUser] = useState<UserType | null>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin'); // 'signin' or 'signup'
+    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-    // Helper function to open Auth Modal
+    // NEW STATE: For internal routing
+    const [currentView, setCurrentView] = useState<View>('home');
+
+
+    // 🚩 EFFECT: Load user state from local storage on mount (Persistence Fix)
+    useEffect(() => {
+        try {
+            const storedUser = localStorage.getItem('royalEscapeUser');
+            if (storedUser) {
+                setUser(JSON.parse(storedUser) as UserType);
+            }
+        } catch (error) {
+            console.error("Failed to load user from localStorage:", error);
+            localStorage.removeItem('royalEscapeUser');
+            setUser(null);
+        }
+    }, []);
+
     const openAuthModal = useCallback((mode: 'signin' | 'signup') => {
         setAuthMode(mode);
         setIsAuthOpen(true);
-        // Always close the profile dropdown when opening the auth modal
-        setIsProfileDropdownOpen(false);
     }, []);
 
-    // Helper function to close Auth Modal
     const closeAuthModal = useCallback(() => {
         setIsAuthOpen(false);
+        setRedirectAfterAuth(null);
     }, []);
 
-    // Handler for successful authentication (called by AuthModal)
-    const handleAuthSuccess = useCallback((authenticatedUser: { name: string; email: string }) => {
-        setUser(authenticatedUser); // Set the logged-in user object
-        closeAuthModal();
-    }, [closeAuthModal]);
+    // 🚩 UPDATED: Handle view change and close dropdown
+    const handleViewChange = useCallback((view: View) => {
+        setCurrentView(view);
+        setIsProfileDropdownOpen(false);
+        if (view === 'home') {
+            // Using window.location.href to simulate navigation back to the root if needed
+            // window.location.href = '/'; 
+        } else {
+            console.log(`Navigating to ${view} view...`);
+        }
+    }, []);
 
-    // Handler for signing out
+    // UPDATED: Save user to localStorage on success
+    const handleAuthSuccess = useCallback((authenticatedUser: UserType) => {
+        setUser(authenticatedUser);
+        localStorage.setItem('royalEscapeUser', JSON.stringify(authenticatedUser));
+        closeAuthModal();
+
+        if (redirectAfterAuth) {
+            // Use standard window location redirection
+            setTimeout(() => {
+                window.location.href = redirectAfterAuth;
+            }, 100);
+        }
+    }, [closeAuthModal, redirectAfterAuth]);
+
+    // UPDATED: Clear persistence on sign out
     const handleSignOut = useCallback(() => {
         setUser(null);
-        setIsProfileDropdownOpen(false);
-        // In a production app, this is where you'd call Firebase/Supabase/etc. signOut method
+        localStorage.removeItem('royalEscapeUser');
         console.log("User signed out.");
+        setIsProfileDropdownOpen(false);
+        setCurrentView('home'); // Go back to home view
+        // window.location.href = '/'; 
     }, []);
-    // ----------------------------------------
 
-
-    // --- APPLICATION STATE ---
-    // The cart now tracks the selected POT (entry) and the selected MERCH (physical item).
-    // Structure: [{ type: 'pot', id: 1, name: 'MacBook Air M3 Entry', price: 249 }, { type: 'merch', id: 1, name: 'Royal Tee', price: 0 }]
-    const [cart, setCart] = useState<{ type: 'pot' | 'merch'; id: number; name: string; price: number; }[]>([]);
-    const [wallet] = useState(0); // Keeping wallet state for potential future use
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-
-    // --- CONSTANTS FOR NEW FLOW ---
     const COUPON_PRICE = 249;
 
+    // FUNCTION: Handles click on a Pot, checks authentication, and redirects
+    const handlePotClick = (potId: number) => {
+        const potUrl = `/pot/${potId}`;
 
-    // Logic for outside click of the dropdown - FIXED to target the entire container
-    useEffect(() => {
-        if (!isProfileDropdownOpen) return;
-
-        const handleClickOutside = (event: MouseEvent) => {
-            const container = document.getElementById('profile-dropdown-container'); // Check the entire container
-            const target = event.target as HTMLElement;
-
-            // Close if the click is outside the entire profile container element
-            if (container && !container.contains(target)) {
-                setIsProfileDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isProfileDropdownOpen]);
-
-    // Calculate total price in cart
-    const cartTotalPrice = cart.reduce((sum, item) => sum + item.price, 0);
-
-
-    // --- DATA STRUCTURES (UPDATED) ---
-
-    // 1. Luxury Rewards (Pots) - These are now the main items a user 'buys' for the entry
-    const luxuryRewards = [
-        {
-            id: 1,
-            name: "MacBook Air M3",
-            value: "₹1,20,000",
-            icon: "💻",
-            status: "live", // Changed status to live
-            rewardValue: "₹1,20,000",
-            description: "Your entry ticket to win this dream machine."
-        },
-        {
-            id: 2,
-            name: "Gold Coin",
-            value: "₹30,000-₹40,000",
-            icon: "🪙",
-            status: "live",
-            rewardValue: "₹30,000-₹40,000",
-            description: "A chance to win a valuable investment asset."
-        },
-        {
-            id: 3,
-            name: "Luxury Hotel Staycation",
-            value: "₹25,000",
-            icon: "🏨",
-            status: "live",
-            rewardValue: "₹25,000",
-            description: "Unlock an amazing weekend getaway."
-        },
-        {
-            id: 4,
-            name: "Apple Watch Ultra 2",
-            value: "₹70,000",
-            icon: "⌚",
-            status: "live",
-            rewardValue: "₹70,000",
-            description: "Enter to win the ultimate smartwatch."
-        },
-        {
-            id: 5,
-            name: "Royal Escape Maldives Trip",
-            value: "₹1.2L",
-            icon: "🏝️",
-            status: "live",
-            rewardValue: "₹1.2L",
-            description: "A free entry to win an all-inclusive trip."
-        },
-        {
-            id: 6,
-            name: "iPhone 15 Pro Max",
-            value: "₹1,50,000",
-            icon: "📱",
-            status: "live",
-            rewardValue: "₹1,50,000",
-            description: "Get your chance to own the latest flagship phone."
-        },
-        {
-            id: 7,
-            name: "Dubai Luxury Package",
-            value: "₹2,00,000",
-            icon: "✈️",
-            status: "live",
-            rewardValue: "₹2,00,000",
-            description: "Win a premium vacation package."
-        },
-        {
-            id: 8,
-            name: "PS5 Console Bundle",
-            value: "₹60,000",
-            icon: "🎮",
-            status: "live",
-            rewardValue: "₹60,000",
-            description: "Your entry for a next-gen gaming console."
-        },
-        {
-            id: 9,
-            name: "Samsung Galaxy Z Fold",
-            value: "₹1,80,000",
-            icon: "📱",
-            status: "live",
-            rewardValue: "₹1,80,000",
-            description: "Win a high-end foldable smartphone."
-        },
-        {
-            id: 10,
-            name: "Swiss Watch Collection",
-            value: "₹3,00,000",
-            icon: "⌚",
-            status: "live",
-            rewardValue: "₹3,00,000",
-            description: "Enter for a chance to win a luxury timepiece set."
-        }
-    ];
-
-    // 2. Merchandise - Now tied to the pot purchase
-    const merchandise = [
-        {
-            id: 1,
-            name: "Royal Tee (T-Shirt)",
-            price: 799,
-            // Custom image with better fit
-            image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-            tag: `Additional ₹${799 - COUPON_PRICE}`,
-            costAfterCoupon: 799 - COUPON_PRICE // 550
-        },
-        {
-            id: 2,
-            name: "Royal Cap",
-            price: 249, // This item is FREE with the coupon
-            // DUMMY IMAGE for cap (Royal Escape Style)
-            image: "/cap.png",
-            tag: "FREE with Entry",
-            costAfterCoupon: 0
-        },
-        {
-            id: 3,
-            name: "Royal Hoodie",
-            price: 1499,
-            // Custom image with better fit
-            image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-            tag: `Additional ₹${1499 - COUPON_PRICE}`,
-            costAfterCoupon: 1499 - COUPON_PRICE // 1250
-        },
-        {
-            id: 4,
-            name: "Royal Tote Bag",
-            price: 499,
-            // Custom image with better fit
-            image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-            tag: `Additional ₹${499 - COUPON_PRICE}`,
-            costAfterCoupon: 499 - COUPON_PRICE // 250
-        },
-        {
-            id: 5,
-            name: "Royal Key Chain",
-            price: 249, // This item is FREE with the coupon
-            // DUMMY IMAGE for key chain (Royal Escape Style)
-            image: "/key_chain.png",
-            tag: "FREE with Entry",
-            costAfterCoupon: 0
-        },
-        {
-            id: 6,
-            name: "Mystery Merch Box",
-            price: 999,
-            // Custom image with better fit (using "hamper" as context for the box image)
-            image: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-            tag: `Additional ₹${999 - COUPON_PRICE}`,
-            costAfterCoupon: 999 - COUPON_PRICE // 750
-        }
-    ];
-
-    // --- ACTION HANDLERS (UPDATED) ---
-
-    const addPotToCart = (pot: typeof luxuryRewards[number]) => {
-        // Clear existing pot entries to ensure only one entry/pot is selected at a time
-        const newCart = cart.filter(item => item.type !== 'pot');
-
-        newCart.push({
-            type: 'pot',
-            id: pot.id,
-            name: `${pot.name} Entry Ticket`,
-            price: COUPON_PRICE
-        });
-
-        setCart(newCart);
-    };
-
-    const addMerchToCart = (item: typeof merchandise[number]) => {
-        // Clear existing merch items to ensure only one merch is selected at a time
-        const newCart = cart.filter(cartItem => cartItem.type !== 'merch' && cartItem.type !== 'pot');
-
-        // Ensure a pot (entry) is selected first
-        const selectedPot = cart.find(cartItem => cartItem.type === 'pot');
-
-        if (selectedPot) {
-            newCart.push(selectedPot);
+        if (user) {
+            // Use standard window location redirection
+            window.location.href = potUrl;
         } else {
-            // Optional: Show error if no pot is selected, but for simplicity, we'll assume the user follows the flow
-            alert("Please select a Luxury Reward Pot (Entry) first!");
-            return;
+            setRedirectAfterAuth(potUrl);
+            openAuthModal('signin');
         }
-
-        newCart.push({
-            type: 'merch',
-            id: item.id,
-            name: item.name,
-            price: item.costAfterCoupon
-        });
-
-        setCart(newCart);
     };
+
+    // --- Data (only needed for home view) ---
+    const livePots = [
+        { id: 1, name: "MacBook Air M3", icon: "💻", value: "₹1,20,000", description: "Your entry ticket to win this dream machine." },
+        { id: 2, name: "Gold Coin", icon: "🪙", value: "₹30,000-₹40,000", description: "A chance to win a valuable investment asset." },
+        { id: 3, name: "Luxury Hotel Staycation", icon: "🏨", value: "₹25,000", description: "Unlock an amazing weekend getaway." },
+        { id: 4, name: "Apple Watch Ultra 2", icon: "⌚", value: "₹70,000", description: "Enter to win the ultimate smartwatch." },
+        { id: 5, name: "Royal Escape Maldives Trip", icon: "🏝️", value: "₹1,20,000", description: "A free entry to win an all-inclusive trip." }
+    ];
+
+    const comingSoonPots = [
+        { id: 6, name: "iPhone 16 Pro", icon: "📱", value: "₹1,60,000", description: "Coming soon to Royal Escape draws!" },
+        { id: 7, name: "Dubai Luxury Trip", icon: "✈️", value: "₹2,00,000", description: "An exclusive travel experience awaits." },
+        { id: 8, name: "Swiss Watch Collection", icon: "⌚", value: "₹3,00,000", description: "Timeless elegance for the lucky winner." }
+    ];
+
+    // --- Conditional Rendering based on View State ---
+
+    const renderContent = () => {
+        if (!user) return <HomeViewContent user={null} handleViewChange={handleViewChange} />;
+
+        switch (currentView) {
+            case 'personalInfo':
+                // NEW: Use the redesigned MyPersonalInfo component
+                return <MyPersonalInfo user={user} />;
+            case 'myReferrals':
+                // NEW: Use the separate MyReferrals component
+                return <MyReferrals user={user} />;
+            case 'myOrders':
+                // Passes user to MyDashboard
+                return <MyDashboard user={user} />;
+            case 'myWallet':
+                return <section className="max-w-4xl mx-auto py-12 px-4 text-center text-white"><h2 className="text-4xl font-bold mb-4 text-yellow-400">My Wallet</h2><p className="text-lg text-gray-400">Manage your Royal Escape funds here. Current Balance: **₹0**</p><p className="mt-8 text-sm text-gray-500">Feature implementation pending. Click &apos;Add Money&apos; in the header to navigate here when developed.</p></section>;
+            case 'home':
+            default:
+                // Home view content, which handles the Hero/Summary swap internally
+                return <HomeViewContent user={user} handleViewChange={handleViewChange} />;
+        }
+    };
+
+    // Helper component to keep the main return clean
+    // 🚩 MODIFIED: HomeViewContent now includes the boast stats when user is null
+    const HomeViewContent: React.FC<{ user: UserType | null, handleViewChange: (view: View) => void }> = ({ user, handleViewChange }) => (
+        <>
+            {/* Hero Banner / Dashboard Summary (CONDITIONALLY RENDERED) */}
+            {user ? (
+                // LOGGED IN: User Dashboard Summary
+                <UserDashboardSummary user={user} handleViewChange={handleViewChange} />
+            ) : (
+                // LOGGED OUT: Promotional Hero Banner
+                <section className="relative py-12 px-4 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 via-orange-500/10 to-pink-500/10" />
+                    <div className="max-w-7xl mx-auto text-center relative z-10">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/20 rounded-full border border-yellow-400/30 mb-6">
+                            <Sparkles className="w-4 h-4 text-yellow-400" />
+                            <span className="text-sm font-semibold text-yellow-400">10 Live Luxury Pots Running Now!</span>
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
+                                The Ultimate Escape:{" "}
+                            </span>
+                            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+                                Win Luxury & Get Free Merch
+                            </span>
+                        </h1>
+                        <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-extrabold">
+                                Secure your **Entry Ticket** and gain immediate access to exclusive benefits: A{' '}
+                                high value coupon
+                            </span>
+                            , a{' '}
+                            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent font-extrabold">
+                                FREE TICKET to win high end prizes
+                            </span>
+                            , and an{' '}
+                            <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent font-extrabold">
+                                exclusive merchandise
+                            </span>
+                            .
+                        </p>
+
+                        {/* NEW: Company Boast Stats */}
+                        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto text-center">
+                            {/* Stat 1: Lucky Winners */}
+                            <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700 shadow-xl">
+                                <Sparkles className="w-8 h-8 text-yellow-400 mb-2 mx-auto" />
+                                <p className="text-3xl font-extrabold text-white">500+</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Lucky Winners</p>
+                            </div>
+                            {/* Stat 2: Prize Money Won */}
+                            <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700 shadow-xl">
+                                <Trophy className="w-8 h-8 text-green-400 mb-2 mx-auto" />
+                                <p className="text-3xl font-extrabold text-white">₹5 Cr+</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Prize Money Won</p>
+                            </div>
+                            {/* Stat 3: Active Users */}
+                            <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700 shadow-xl">
+                                <User className="w-8 h-8 text-blue-400 mb-2 mx-auto" />
+                                <p className="text-3xl font-extrabold text-white">50K+</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Active Users</p>
+                            </div>
+                            {/* Stat 4: Pots Ran */}
+                            <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700 shadow-xl">
+                                <Crown className="w-8 h-8 text-red-400 mb-2 mx-auto" />
+                                <p className="text-3xl font-extrabold text-white">120+</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Luxury Pots Ran</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+
+            {/* Live Pots (UPDATED HANDLER) */}
+            <section id="live-pots" className="py-16 px-4 bg-gray-900/40">
+                <div className="max-w-7xl mx-auto text-center">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
+                        Live <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Pots</span>
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {livePots.map(pot => (
+                            <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
+                                <div className="text-6xl mb-4">{pot.icon}</div>
+                                <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
+                                <p className="text-gray-400 mb-3">{pot.description}</p>
+                                <p className="text-yellow-400 font-semibold">{pot.value}</p>
+                                <button
+                                    onClick={() => handlePotClick(pot.id)}
+                                    className="mt-4 w-full py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/40 transition-all"
+                                >
+                                    Know More
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+
+            {/* Coming Soon Pots */}
+            <section id="coming-soon" className="py-16 px-4 bg-gray-800/50">
+                <div className="max-w-7xl mx-auto text-center">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
+                        Coming <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Soon</span>
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {comingSoonPots.map(pot => (
+                            <div key={pot.id} className="bg-gray-800/70 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
+                                <div className="text-6xl mb-4">{pot.icon}</div>
+                                <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
+                                <p className="text-gray-400 mb-3">{pot.description}</p>
+                                <p className="text-yellow-400 font-semibold">{pot.value}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+
+    // Determines if we are on an account-specific view (excluding 'home')
+    const isAccountView = currentView !== 'home';
+
+    // CORRECTED CONDITION: Only show promotional sections if the user is LOGGED OUT AND on the home view.
+    const showPromotionalSections = currentView === 'home' && !user;
 
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-            {/* Header */}
+            {/* Header (Unchanged) */}
             <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleViewChange('home')}>
                             <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
                                 <Crown className="w-6 h-6 text-black" />
                             </div>
@@ -536,81 +985,86 @@ export default function RoyalEscapeShop() {
                             </span>
                         </div>
 
+                        {/* Right Side Buttons */}
+                        <div className="flex items-center gap-3">
+                            {user ? (
+                                <>
+                                    {/* Wallet Button (Navigates to myWallet view) */}
+                                    <button
+                                        onClick={() => handleViewChange('myWallet')}
+                                        className="flex items-center gap-1 px-3 py-2 border border-green-500 text-green-400 font-semibold rounded-lg hover:bg-green-500/10 transition-all"
+                                    >
+                                        <Wallet className="w-5 h-5" />
+                                        <span className="hidden sm:inline">Add Money</span>
+                                    </button>
 
+                                    {/* Profile Dropdown (UPDATED OPTIONS) */}
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setIsProfileDropdownOpen(prev => !prev)}
+                                            className="flex items-center justify-center w-10 h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400"
+                                        >
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </button>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden md:flex items-center gap-6">
-                            <a href="#pots" className="text-gray-300 hover:text-yellow-400 transition-colors">Live Pots</a>
-                            <a href="#merch" className="text-gray-300 hover:text-yellow-400 transition-colors">Free Merch</a>
-                            <a href="#how-it-works" className="text-gray-300 hover:text-yellow-400 transition-colors">How It Works</a>
-                        </nav>
-
-
-                        {/* Right Side Actions */}
-                        <div className="flex items-center gap-4">
-                            {user && ( // Only show wallet if logged in
-                                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-full border border-gray-700">
-                                    <Wallet className="w-4 h-4 text-yellow-400" />
-                                    <span className="text-sm font-semibold text-white">₹{wallet}</span>
-                                </div>
-                            )}
-                            <button className="relative p-2 bg-gray-800 rounded-full border border-gray-700 hover:border-yellow-400 transition-colors">
-                                <ShoppingCart className="w-5 h-5 text-gray-300" />
-                                {cart.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-black">
-                                        {cart.length}
-                                    </span>
-                                )}
-                            </button>
-
-                            {/* Profile Dropdown Container */}
-                            <div className="hidden md:relative md:block" id="profile-dropdown-container">
-                                <button
-                                    id="profile-dropdown-button"
-                                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                                    // Use a different color if user is logged in
-                                    className={`p-2 bg-gray-800 rounded-full border ${user ? 'border-yellow-400/80 hover:border-yellow-400' : 'border-gray-700 hover:border-yellow-400'} transition-colors`}
-                                >
-                                    <User className={`w-5 h-5 ${user ? 'text-yellow-400' : 'text-gray-300'}`} />
-                                </button>
-
-                                {isProfileDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-20">
-                                        {user ? (
-                                            // LOGGED IN VIEW
-                                            <>
-                                                <div className="px-4 py-3 text-sm text-yellow-400 font-semibold truncate border-b border-gray-700">
-                                                    {user.name || 'Your Profile'}
+                                        {isProfileDropdownOpen && (
+                                            <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
+                                                <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-700 truncate">
+                                                    Hi, **{user.name.split(' ')[0]}**
                                                 </div>
-                                                <a
-                                                    href="#profile" // Placeholder link
-                                                    onClick={() => setIsProfileDropdownOpen(false)}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400 transition-colors"
+                                                <button
+                                                    onClick={() => handleViewChange('myOrders')}
+                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
                                                 >
-                                                    <UserIcon className="w-4 h-4" /> View Profile
-                                                </a>
+                                                    <ListOrdered className="w-4 h-4 mr-2" /> My Dashboard
+                                                </button>
+                                                <button
+                                                    onClick={() => handleViewChange('myWallet')}
+                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
+                                                >
+                                                    <Wallet className="w-4 h-4 mr-2" /> My Wallet
+                                                </button>
+                                                <button
+                                                    onClick={() => handleViewChange('personalInfo')}
+                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
+                                                >
+                                                    <User className="w-4 h-4 mr-2" /> My Personal Info
+                                                </button>
+                                                <button
+                                                    onClick={() => handleViewChange('myReferrals')}
+                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center border-b border-gray-700 pb-2 mb-2"
+                                                >
+                                                    <Link className="w-4 h-4 mr-2" /> My Referrals
+                                                </button>
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-gray-700 transition-colors border-t border-gray-700"
+                                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center"
                                                 >
-                                                    <LogOut className="w-4 h-4" /> Sign Out
+                                                    <Lock className="w-4 h-4 mr-2" /> Sign Out
                                                 </button>
-                                            </>
-                                        ) : (
-                                            // LOGGED OUT VIEW - Combined button
-                                            <button
-                                                type="button"
-                                                // Default to signin, user can switch to signup inside the modal
-                                                onClick={() => openAuthModal('signin')}
-                                                className="block w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400 transition-colors"
-                                            >
-                                                Sign In / Register
-                                            </button>
+                                            </div>
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                </>
+                            ) : (
+                                // Login/Register Buttons (for logged out users)
+                                <>
+                                    <button
+                                        onClick={() => openAuthModal('signin')}
+                                        className="px-5 py-2 border border-yellow-400 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-all"
+                                    >
+                                        Login
+                                    </button>
+                                    <button
+                                        onClick={() => openAuthModal('signup')}
+                                        className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all"
+                                    >
+                                        REGISTER
+                                    </button>
+                                </>
+                            )}
 
+                            {/* Mobile Menu Button */}
                             <button
                                 className="md:hidden p-2"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -620,326 +1074,86 @@ export default function RoyalEscapeShop() {
                         </div>
                     </div>
                 </div>
-
-                {/* Mobile Menu (UPDATED AUTH LOGIC) */}
-                {mobileMenuOpen && (
-                    <div className="md:hidden bg-gray-800 border-t border-gray-700">
-                        <nav className="px-4 py-4 space-y-3">
-                            <a href="#pots" onClick={() => setMobileMenuOpen(false)} className="block text-gray-300 hover:text-yellow-400 transition-colors">Live Pots</a>
-                            <a href="#merch" onClick={() => setMobileMenuOpen(false)} className="block text-gray-300 hover:text-yellow-400 transition-colors">Free Merch</a>
-                            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block text-gray-300 hover:text-yellow-400 transition-colors">How It Works</a>
-
-                            {user ? (
-                                // Mobile Logged In Links
-                                <>
-                                    <a href="#profile" onClick={() => setMobileMenuOpen(false)} className="block text-gray-300 hover:text-yellow-400 transition-colors py-1">
-                                        View Profile
-                                    </a>
-                                    <button
-                                        type="button"
-                                        onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
-                                        className="block w-full text-left text-red-400 hover:text-red-300 transition-colors py-1 border-t border-gray-700 pt-3 mt-3"
-                                    >
-                                        Sign Out
-                                    </button>
-                                </>
-                            ) : (
-                                // Mobile Logged Out Link (Combined)
-                                <button
-                                    type="button"
-                                    onClick={() => { openAuthModal('signin'); setMobileMenuOpen(false); }}
-                                    className="block w-full text-left text-gray-300 hover:text-yellow-400 transition-colors py-1"
-                                >
-                                    Sign In / Register
-                                </button>
-                            )}
-                        </nav>
-                    </div>
-                )}
             </header>
 
-            {/* Hero Banner (UPDATED MESSAGE) */}
-            <section className="relative py-12 px-4 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 via-orange-500/10 to-pink-500/10" />
-                <div className="max-w-7xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/20 rounded-full border border-yellow-400/30 mb-6">
-                        <Sparkles className="w-4 h-4 text-yellow-400" />
-                        <span className="text-sm font-semibold text-yellow-400">10 Live Luxury Pots Running Now!</span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                        <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
-                            Buy Your Entry{" "}
-                        </span>
-                        <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
-                            Win Luxury & Get Free Merch
-                        </span>
-                    </h1>
-                    <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                        Select any of the 10 Live Pots for just **₹{COUPON_PRICE}** to get a coupon, a free entry, and choose a free or discounted merch item!
-                    </p>
-                </div>
-            </section>
+            {/* Main Content Render */}
+            <main className="min-h-[calc(100vh-64px-100px)]">
+                {renderContent()}
+            </main>
 
-            {/* 1. Live Royal Escape Pots Section (NEW PRIMARY SECTION) */}
-            <section id="pots" className="py-16 px-4 bg-gradient-to-b from-transparent to-gray-900/50">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
-                                10 Live Royal Escape Pots{" "}
+            {/* How It Works Section (CONDITIONALLY RENDERED) */}
+            {/* FINAL FIX: Only render if `showPromotionalSections` is true (i.e., NOT logged in AND on home) */}
+            {showPromotionalSections && (
+                <section id="how-it-works" className="py-16 px-4">
+                    <div className="max-w-5xl mx-auto">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-12">
+                            How It{" "}
+                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                                Works
                             </span>
-                            <span className="text-gray-400 text-2xl">(Entry: ₹{COUPON_PRICE})</span>
                         </h2>
-                        <p className="text-gray-300 text-lg">
-                            Each **₹{COUPON_PRICE}** entry ticket grants you a chance to win the corresponding luxury reward and a coupon for merch.
-                        </p>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                        {luxuryRewards.map((reward) => (
-                            <div
-                                key={reward.id}
-                                className={`bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl p-6 border ${cart.some(item => item.type === 'pot' && item.id === reward.id) ? 'border-green-400 ring-4 ring-green-400/30' : 'border-gray-700/50 hover:border-yellow-400/50'} relative overflow-hidden group transition-all duration-300`}
-                            >
-                                <div className="relative z-10 text-center space-y-4">
-                                    <div className="text-6xl mb-4">
-                                        {reward.icon}
-                                    </div>
-
-                                    <h3 className="text-xl font-bold text-white min-h-[3rem] flex items-center justify-center">
-                                        {reward.name}
-                                    </h3>
-
-                                    <div className="space-y-2">
-                                        <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-                                            <p className="text-xs text-gray-500 mb-1">Pot worth up to</p>
-                                            <p className="text-xl font-bold text-yellow-400">{reward.value}</p>
-                                        </div>
-
-                                        <p className="text-sm text-gray-400">
-                                            {reward.description}
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => addPotToCart(reward)}
-                                        className="w-full py-2 mt-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/50 transition-all disabled:opacity-50"
-                                        disabled={cart.some(item => item.type === 'pot' && item.id === reward.id)} // Disable if already selected
-                                    >
-                                        {cart.some(item => item.type === 'pot' && item.id === reward.id) ? 'Selected' : `Buy Entry for ₹${COUPON_PRICE}`}
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* 2. Merchandise Section (UPDATED MESSAGE & LOGIC) */}
-            <section id="merch" className="py-16 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
-                                Select Your Merch Gift{" "}
-                            </span>
-                            <span className="text-gray-400 text-2xl">(Coupon Applied)</span>
-                        </h2>
-                        <p className="text-gray-300 text-lg">
-                            Your **₹{COUPON_PRICE}** entry includes a coupon. Choose a merch item: pay only the difference for premium items, or get a base item free!
-                        </p>
-                        {/* Cart Summary Card */}
-                        <div className="max-w-lg mx-auto mt-6 p-4 bg-gray-800/70 border border-yellow-500/50 rounded-xl shadow-xl">
-                            <h3 className="text-xl font-bold text-white mb-2">Current Cart</h3>
-                            <div className="text-left text-sm text-gray-300 space-y-1">
-                                {cart.length === 0 ? (
-                                    <p className="text-red-400">Cart is empty. Select a Pot first!</p>
-                                ) : (
-                                    cart.map((item, index) => (
-                                        <div key={index} className="flex justify-between">
-                                            <span>{item.name} {item.type === 'pot' && '(Entry)'}</span>
-                                            <span className={item.price > 0 ? 'text-yellow-400' : 'text-green-400'}>
-                                                + ₹{item.price}
-                                            </span>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                            <div className="border-t border-gray-700 my-3 pt-3 flex justify-between items-center">
-                                <span className="text-lg font-bold text-white">Total:</span>
-                                <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                                    ₹{cartTotalPrice}
-                                </span>
-                            </div>
-                            {cart.length > 0 && (
-                                <button
-                                    type="button"
-                                    className="w-full py-2 bg-gradient-to-r from-green-500 to-teal-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-green-400/50 transition-all"
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                {
+                                    step: "1",
+                                    title: "Choose Your Pot",
+                                    description: `Select any of the 10 Live Luxury Pots and pay the ₹${COUPON_PRICE} entry fee.`,
+                                    icon: Trophy
+                                },
+                                {
+                                    step: "2",
+                                    title: "Select Your Merch",
+                                    description: `Your entry fee includes a coupon. Choose a merch item: get a base item FREE or pay the difference for premium.`,
+                                    icon: Gift
+                                },
+                                {
+                                    step: "3",
+                                    title: "Win Amazing Prizes",
+                                    description: "You are now officially entered for a chance to win MacBooks, trips, gold coins, and more!",
+                                    icon: Sparkles
+                                }
+                            ].map((item) => (
+                                <div
+                                    key={item.step}
+                                    className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl p-8 border border-gray-700 text-center hover:border-yellow-400/50 transition-all duration-300 hover:scale-105"
                                 >
-                                    Proceed to Checkout
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {merchandise.map((item) => (
-                            <div
-                                key={item.id}
-                                className={`bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl overflow-hidden border ${cart.some(cartItem => cartItem.type === 'merch' && cartItem.id === item.id) ? 'border-yellow-400 ring-4 ring-yellow-400/30' : 'border-gray-700 hover:border-yellow-400/50'} transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-yellow-400/20`}
-                            >
-                                <div className="relative h-64 overflow-hidden">
-                                    <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        // THIS IS THE CRITICAL CHANGE: ensuring the image covers the entire box area
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).onerror = null;
-                                            (e.target as HTMLImageElement).src = `https://placehold.co/400x400/1f2937/d1d5db?text=Merch+Item`;
-                                        }}
-                                    />
-                                    <div className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 px-3 py-1 rounded-full">
-                                        <span className="text-xs font-bold text-black">{item.tag}</span>
+                                    <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <item.icon className="w-8 h-8 text-black" />
                                     </div>
+                                    <div className="text-yellow-400 text-4xl font-bold mb-4">{item.step}</div>
+                                    <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                                    <p className="text-gray-400">{item.description}</p>
                                 </div>
-                                <div className="p-5 space-y-3">
-                                    <h3 className="text-xl font-bold text-white">{item.name}</h3>
-                                    <div className="bg-gray-700/50 rounded-lg p-3">
-                                        <p className="text-sm text-gray-400">
-                                            Coupon Value: **₹{COUPON_PRICE}**
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center justify-between pt-3 border-t border-gray-700">
-                                        <div className="text-left">
-                                            <span className="block text-sm text-gray-400 line-through">Retail: ₹{item.price}</span>
-                                            <span className="text-2xl font-bold text-green-400">
-                                                {item.costAfterCoupon === 0 ? 'FREE' : `+₹${item.costAfterCoupon}`}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => addMerchToCart(item)}
-                                            disabled={cart.some(cartItem => cartItem.type === 'merch' && cartItem.id === item.id) || cart.filter(item => item.type === 'pot').length === 0}
-                                            className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/50 transition-all disabled:opacity-50 disabled:bg-gray-600 disabled:text-gray-300"
-                                        >
-                                            {cart.filter(item => item.type === 'pot').length === 0 ? 'Select Pot First' : (cart.some(cartItem => cartItem.type === 'merch' && cartItem.id === item.id) ? 'Selected' : 'Select Item')}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="text-center mt-8">
-                        <button type="button" className="px-8 py-3 bg-gray-800 border-2 border-yellow-400 text-yellow-400 font-bold rounded-xl hover:bg-yellow-400 hover:text-black transition-all duration-300">
-                            View All Merchandise
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works Section (UPDATED STEPS) */}
-            <section id="how-it-works" className="py-16 px-4">
-                <div className="max-w-5xl mx-auto">
-                    <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-12">
-                        How It{" "}
-                        <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                            Works
-                        </span>
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                step: "1",
-                                title: "Choose Your Pot",
-                                description: `Select any of the 10 Live Luxury Pots and pay the ₹${COUPON_PRICE} entry fee.`,
-                                icon: Trophy
-                            },
-                            {
-                                step: "2",
-                                title: "Select Your Merch",
-                                description: `Your entry fee includes a coupon. Choose a merch item: get a base item FREE or pay the difference for premium.`,
-                                icon: Gift
-                            },
-                            {
-                                step: "3",
-                                title: "Win Amazing Prizes",
-                                description: "You are now officially entered for a chance to win MacBooks, trips, gold coins, and more!",
-                                icon: Sparkles
-                            }
-                        ].map((item) => (
-                            <div
-                                key={item.step}
-                                className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl p-8 border border-gray-700 text-center hover:border-yellow-400/50 transition-all duration-300 hover:scale-105"
-                            >
-                                <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <item.icon className="w-8 h-8 text-black" />
-                                </div>
-                                <div className="text-yellow-400 text-4xl font-bold mb-4">{item.step}</div>
-                                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                                <p className="text-gray-400">{item.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* FAQ Section (Now MOCK) */}
-            <FAQSection />
-
-            {/* Footer */}
-            <footer className="border-t border-gray-800 bg-gray-900/50 backdrop-blur">
-                <div className="max-w-7xl mx-auto px-6 py-12">
-                    <div className="text-center space-y-6">
-                        <div className="flex items-center justify-center space-x-2">
-                            <Sparkles className="w-5 h-5 text-yellow-400" />
-                            <span className="font-bold text-xl text-white">Royal Escape</span>
-                        </div>
-                        <p className="text-gray-400 max-w-2xl mx-auto">
-                            The ultimate gaming experience where every purchase could win you amazing trips to incredible destinations
-                        </p>
-                        <div className="flex justify-center gap-6">
-                            <a
-                                href="https://www.instagram.com/royale_escape/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group bg-gradient-to-r from-pink-500/20 to-purple-500/20 p-4 rounded-full border border-pink-500/30 hover:border-pink-400 transition-all duration-300 hover:shadow-lg hover:shadow-pink-400/20"
-                            >
-                                <Instagram className="w-6 h-6 text-pink-400 group-hover:scale-110 transition-transform duration-300" />
-                            </a>
-                            <a
-                                href="#"
-                                className="group bg-gradient-to-r from-blue-500/20 to-blue-600/20 p-4 rounded-full border border-blue-500/30 hover:border-blue-400 transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/20"
-                            >
-                                <Facebook className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
-                            </a>
-                            <a
-                                href="#"
-                                className="group bg-gradient-to-r from-sky-500/20 to-cyan-500/20 p-4 rounded-full border border-sky-500/30 hover:border-sky-400 transition-all duration-300 hover:shadow-lg hover:shadow-sky-400/20"
-                            >
-                                <MessageCircle className="w-6 h-6 text-sky-400 group-hover:scale-110 transition-transform duration-300" />
-                            </a>
-                        </div>
-                        <div className="border-t border-gray-800 pt-8">
-                            <p className="text-gray-500 text-sm">
-                                © 2024 Royal Escape. All rights reserved. |
-                                <a href="mailto:support@royalescape.club" className="hover:text-yellow-400 transition-colors duration-300 ml-2">
-                                    support@royalescape.club
-                                </a>
-                            </p>
+                            ))}
                         </div>
                     </div>
+                </section>
+            )}
+
+            {/* FAQ Section (Always shown in original, but wrapped in component) */}
+            {showPromotionalSections && <FAQSection />}
+
+            {/* Footer (Always Visible) */}
+            <footer className="border-t border-gray-800 bg-gray-900/50 backdrop-blur py-10 text-center">
+                <div className="flex justify-center gap-6 mb-6">
+                    <a href="https://www.instagram.com/royale_escape/" target="_blank" rel="noopener noreferrer">
+                        <Instagram className="w-6 h-6 text-pink-400 hover:scale-110 transition-transform" />
+                    </a>
+                    <a href="#"><Facebook className="w-6 h-6 text-blue-400 hover:scale-110 transition-transform" /></a>
+                    <a href="#"><MessageCircle className="w-6 h-6 text-sky-400 hover:scale-110 transition-transform" /></a>
                 </div>
+                <p className="text-gray-500 text-sm">
+                    © 2025 Royal Escape. All rights reserved. |
+                    <a href="mailto:support@royalescape.club" className="hover:text-yellow-400 ml-1">support@royalescape.club</a>
+                </p>
             </footer>
 
-            {/* Auth Modal Component Rendered Here */}
+            {/* Auth Modal */}
             <AuthModal
                 isOpen={isAuthOpen}
                 onClose={closeAuthModal}
                 initialMode={authMode}
-                // Pass the success handler here
                 onAuthSuccess={handleAuthSuccess}
             />
         </div>
