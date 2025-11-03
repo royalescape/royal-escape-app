@@ -115,7 +115,7 @@ const MyPersonalInfo: React.FC<{ user: UserType }> = ({ user }) => {
     // Mock user data state to simulate form fields (using user prop for initial values)
     const [formData, setFormData] = useState({
         fullName: user.name,
-        userName: '+918237219389', // Mock value
+        userName: '+918212987362', // Mock value
         dob: 'DD/MM/YYYY', // Mock value
         address: '',
         currency: 'Indian Rupee',
@@ -147,7 +147,7 @@ const MyPersonalInfo: React.FC<{ user: UserType }> = ({ user }) => {
     const handleReset = () => {
         setFormData({
             fullName: user.name,
-            userName: '+918237219389',
+            userName: '+918212987362',
             dob: 'DD/MM/YYYY',
             address: '',
             currency: 'Indian Rupee',
