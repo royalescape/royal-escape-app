@@ -601,7 +601,7 @@ const RoyalEscapeHeader = ({
 
     // Mock user data - In production, this would come from your auth context/state
     // You can pass this as a prop in production
-    const user = { name: "HUMZA", email: "user@example.com" };
+    const user = { name: "Royal Escape", email: "user@example.com" };
     const isLoggedIn = true; // Set to false to show login/register buttons
 
     const handleHomeClick = () => {
