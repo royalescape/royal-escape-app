@@ -7,7 +7,6 @@ interface AuthModalProps {
     onClose: () => void;
     initialMode: 'signin' | 'signup';
     // The handler to be called when auth is successful.
-    // In a real app, this would receive a JWT or a User object.
     onAuthSuccess: (user: { name: string; email: string }) => void;
 }
 
@@ -21,6 +20,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false); // NEW STATE for success message
 
     // Sync mode when the modal is opened with a new initialMode prop
     useEffect(() => {
@@ -33,18 +33,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
         setPassword('');
         setName('');
         setError('');
+        setIsSuccess(false); // Clear success state
     }, [mode, isOpen]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setIsSuccess(false);
         setIsLoading(true);
 
         // --- Mock Authentication Logic ---
         await delay(1500); // Simulate network delay
 
         try {
+            let authenticatedUser: { name: string; email: string };
+
             if (mode === 'signup') {
                 if (!email || !password || !name) {
                     throw new Error('Please fill in all fields.');
@@ -55,7 +59,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
 
                 // Mock Sign Up API call successful
                 console.log(`Mock Sign Up: User ${email} registered.`);
-                onAuthSuccess({ name: name, email: email });
+                authenticatedUser = { name: name, email: email };
 
             } else { // 'signin'
                 if (!email || !password) {
@@ -66,14 +70,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                 console.log(`Mock Sign In: User ${email} logged in.`);
                 // Use a mock user object for consistency with page.tsx
                 const mockUserName = email.split('@')[0];
-                onAuthSuccess({ name: mockUserName, email: email });
+                authenticatedUser = { name: mockUserName, email: email };
             }
+
+            // SUCCESS FLOW: Show message and then call success handler
+            setIsSuccess(true); // Show success message
+            setIsLoading(false); // Stop loading
+
+            await delay(1000); // Wait 1 second for user to see the success message
+
+            onAuthSuccess(authenticatedUser); // Call the success handler
+
             /* eslint-disable  @typescript-eslint/no-explicit-any */
         } catch (err: any) {
             setError(err.message || 'An unexpected error occurred during authentication.');
             setIsLoading(false);
-        } finally {
-            setIsLoading(false);
+            setIsSuccess(false);
         }
     };
 
@@ -127,7 +139,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Enter your full name"
                                     className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                    disabled={isLoading}
+                                    disabled={isLoading || isSuccess}
                                     required
                                 />
                             </div>
@@ -145,7 +157,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@example.com"
                                 className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                disabled={isLoading}
+                                disabled={isLoading || isSuccess}
                                 required
                             />
                         </div>
@@ -162,7 +174,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
                                 className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"
-                                disabled={isLoading}
+                                disabled={isLoading || isSuccess}
                                 required
                             />
                         </div>
@@ -181,18 +193,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                         </div>
                     )}
 
+                    {/* NEW: Success Message */}
+                    {isSuccess && (
+                        <div className="p-3 bg-green-900/50 border border-green-500 text-green-300 text-sm rounded-xl flex items-center gap-2">
+                            <Sparkles className="w-5 h-5" />
+                            {isSignUp ? 'Successfully signed up! Redirecting...' : 'Signed in successfully! Redirecting...'}
+                        </div>
+                    )}
+
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || isSuccess}
                         className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-xl shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                        {isLoading && (
+                        {isLoading && !isSuccess && (
                             <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                         )}
-                        {submitButtonText}
+                        {isSuccess ? 'Success!' : submitButtonText}
                     </button>
                 </form>
 
