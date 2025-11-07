@@ -990,6 +990,33 @@ export default function AdminDashboard() {
                 </main>
             </div>
 
+            {/* --- NEW MOBILE NAVIGATION FOOTER --- */}
+            <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-gray-900 border-t border-gray-800 shadow-2xl">
+                <div className="flex justify-around items-center h-16">
+                    {/* Replicate Sidebar items here for a mobile bottom bar */}
+                    {/* You can map over the same navItems array from the Sidebar component */}
+                    {[
+                        { view: 'home', icon: Home, label: 'Home' },
+                        { view: 'pots', icon: Trophy, label: 'Pots' },
+                        { view: 'users', icon: Users, label: 'Users' },
+                        { view: 'finance', icon: Wallet, label: 'Finance' },
+                    ].map(item => (
+                        <button
+                            key={item.view}
+                            onClick={() => setCurrentView(item.view as DashboardView)}
+                            className={`flex flex-col items-center justify-center p-2 w-1/4 transition-colors ${currentView === item.view
+                                ? 'text-yellow-400 font-bold'
+                                : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <item.icon className="w-5 h-5" />
+                            <span className="text-xs mt-1">{item.label}</span>
+                        </button>
+                    ))}
+                    {/* Note: This example uses a subset of tabs for space */}
+                </div>
+            </nav>
+
             {/* Pot Form Modal */}
             <PotFormModal
                 isOpen={isPotFormOpen}
