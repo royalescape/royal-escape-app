@@ -824,17 +824,19 @@ export default function AdminDashboard() {
     };
 
     const handleSavePot = (potData: Partial<Pot>) => {
-        // Mock save logic
         if (editingPot) {
             setPots(pots.map(p => p.id === editingPot.id ? { ...p, ...potData } : p));
         } else {
+            // Extract only the properties you want from potData, excluding id
+            const { id, ...safePotData } = potData;
+
             const newPot: Pot = {
-                id: Math.max(...pots.map(p => p.id)) + 1,
+                id: pots.length > 0 ? Math.max(...pots.map(p => p.id)) + 1 : 1,
                 totalEntries: 0,
                 revenue: 0,
                 createdDate: new Date().toISOString().split('T')[0],
-                ...potData as Pot
-            };
+                ...safePotData
+            } as Pot;
             setPots([...pots, newPot]);
         }
         setIsPotFormOpen(false);
