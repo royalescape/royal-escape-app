@@ -1,0 +1,76 @@
+"use client";
+
+import React from 'react';
+import { Crown, Trophy, Wallet, Gift, Sparkles } from 'lucide-react';
+import { User, View } from '@/types';
+
+interface UserDashboardSummaryProps {
+    user: User;
+    handleViewChange: (view: View) => void;
+}
+
+const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handleViewChange }) => {
+    // Mock Data (consistent with MyDashboard component)
+    const stats = {
+        activeEntries: 5,
+        walletBalance: 156,
+        referralEarnings: 75,
+        totalTickets: 8
+    };
+
+    return (
+        <section className="relative py-12 px-4 overflow-hidden bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-b border-gray-700">
+            <div className="max-w-7xl mx-auto relative z-10">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                    <Crown className="inline w-10 h-10 mr-3 text-yellow-400" />
+                    Welcome back, <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{user.name.split(' ')[0]}!</span>
+                </h1>
+                <p className="text-xl text-gray-400 max-w-4xl mb-8">
+                    Your Royal Escape overview at a glance. Get ready for the next draw.
+                </p>
+
+                {/* Summary Stats Grid - Added onClick and styling to each stat block */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div
+                        onClick={() => handleViewChange('myOrders')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-blue-400">{stats.activeEntries}</p>
+                        <p className="text-xs text-gray-400">Active Entries</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myWallet')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Wallet className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-green-400">₹{stats.walletBalance}</p>
+                        <p className="text-xs text-gray-400">Wallet Balance</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myReferrals')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Gift className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-purple-400">₹{stats.referralEarnings}</p>
+                        <p className="text-xs text-gray-400">Referral Earnings</p>
+                    </div>
+                    <div
+                        onClick={() => handleViewChange('myOrders')}
+                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    >
+                        <Sparkles className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                        <p className="text-3xl font-bold text-orange-400">{stats.totalTickets}</p>
+                        <p className="text-xs text-gray-400">Total Tickets</p>
+                    </div>
+                </div>
+
+                <div className="mt-6 text-center">
+
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default UserDashboardSummary;

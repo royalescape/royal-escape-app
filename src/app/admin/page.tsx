@@ -7,72 +7,10 @@ import {
     Calendar, DollarSign, Save,
     Home, Tag, MessageSquare
 } from 'lucide-react';
+import { PotItem, User, Coupon, Transaction, SupportTicket, PotStatus } from '@/types';
 
 // --- Types ---
-
 type AdminUser = { email: string; role: 'admin' | 'super-admin' };
-type PotStatus = 'active' | 'upcoming' | 'completed' | 'cancelled' | 'ending-soon'; // Added 'ending-soon'
-type Pot = {
-    id: number;
-    name: string;
-    icon: string;
-    value: string;
-    description: string;
-    status: PotStatus;
-    entryFee: number;
-    totalEntries: number;
-    maxEntries: number;
-    drawDate: string;
-    createdDate: string;
-    revenue: number;
-    winner?: string;
-    merchandiseId?: number; // Link to associated merchandise
-};
-
-type User = {
-    id: number;
-    name: string;
-    email: string;
-    mobile: string;
-    address: string;
-    walletBalance: number;
-    status: 'active' | 'suspended' | 'pending';
-    registrationDate: string;
-    totalEntries: number;
-    totalWinnings: number;
-    referralCode: string;
-};
-
-type Coupon = {
-    id: number;
-    code: string;
-    discountType: 'percentage' | 'fixed';
-    value: number;
-    expiryDate: string;
-    usageLimit: number;
-    usedCount: number;
-    appliesTo: 'global' | 'specific_pot' | 'specific_user';
-    targetId?: number; // Pot ID or User ID
-};
-
-type SupportTicket = {
-    id: number;
-    userId: number;
-    subject: string;
-    status: 'open' | 'in-progress' | 'closed';
-    priority: 'low' | 'medium' | 'high';
-    lastUpdated: string;
-};
-
-type Transaction = {
-    id: number;
-    userId: number;
-    type: 'deposit' | 'spend' | 'win' | 'refund' | 'coupon';
-    amount: number;
-    date: string;
-    status: 'success' | 'failed';
-    potId?: number;
-};
 
 type DashboardView = 'home' | 'pots' | 'users' | 'finance' | 'coupons' | 'support';
 
@@ -80,42 +18,60 @@ type DashboardView = 'home' | 'pots' | 'users' | 'finance' | 'coupons' | 'suppor
 
 const MOCK_ADMIN = { email: 'admin@royalescape.club', role: 'admin' as const };
 
-const MOCK_POTS: Pot[] = [
+// Mapping to match PotItem from @/types but with required fields for Admin view
+const MOCK_POTS: PotItem[] = [
     {
         id: 1,
         name: "MacBook Air M3",
         icon: "💻",
-        value: "₹1,20,000",
+        prizeValue: "₹1,20,000",
         description: "Your entry ticket to win this dream machine.",
         status: 'active',
         entryFee: 249,
-        totalEntries: 950,
-        maxEntries: 1000,
-        drawDate: '2025-01-05', // Updated date for launch context
+        totalEntries: 950, // Renamed from filled
+        // filled: 950, // Map this in real app if keys differ
+        maxEntries: 1000, // Renamed from totalSlots
+        // totalSlots: 1000,
+        drawDate: '2025-01-05',
         createdDate: '2024-12-15',
-        revenue: 236550, // 950 * 249
-        merchandiseId: 1
+        revenue: 236550,
+        merchandiseId: 1,
+        // Default required fields for PotItem
+        category: 'macbook',
+        type: 'Electronics',
+        filled: 950,
+        totalSlots: 1000,
+        remaining: 50,
+        daysLeft: 5,
+        endDate: '2025-01-05'
     },
     {
         id: 2,
         name: "Gold Coin",
         icon: "🪙",
-        value: "₹30,000-₹40,000",
+        prizeValue: "₹30,000-₹40,000",
         description: "A chance to win a valuable investment asset.",
-        status: 'ending-soon', // New status
+        status: 'ending-soon',
         entryFee: 249,
         totalEntries: 750,
         maxEntries: 800,
         drawDate: '2025-01-01',
         createdDate: '2024-12-10',
         revenue: 186750,
-        merchandiseId: 2
+        merchandiseId: 2,
+        category: 'gold',
+        type: 'Financial',
+        filled: 750,
+        totalSlots: 800,
+        remaining: 50,
+        daysLeft: 1,
+        endDate: '2025-01-01'
     },
     {
         id: 6,
         name: "iPhone 16 Pro",
         icon: "📱",
-        value: "₹1,60,000",
+        prizeValue: "₹1,60,000",
         description: "Coming soon to Royal Escape draws!",
         status: 'upcoming',
         entryFee: 299,
@@ -124,7 +80,14 @@ const MOCK_POTS: Pot[] = [
         drawDate: '2025-01-20',
         createdDate: '2024-12-25',
         revenue: 0,
-        merchandiseId: 3
+        merchandiseId: 3,
+        category: 'macbook', // Default fallback
+        type: 'Electronics',
+        filled: 0,
+        totalSlots: 1200,
+        remaining: 1200,
+        daysLeft: 20,
+        endDate: '2025-01-20'
     }
 ];
 
@@ -162,14 +125,14 @@ const MOCK_TICKETS: SupportTicket[] = [
 
 // --- Helper Components (Dashboard Stats and PotFormModal from original file, slightly updated) ---
 
-const DashboardStats: React.FC<{ pots: Pot[] }> = ({ pots }) => {
+const DashboardStats: React.FC<{ pots: PotItem[] }> = ({ pots }) => {
     // ... (Stats calculation remains the same, revenue updated to reflect new mock data)
     const stats = {
-        totalRevenue: pots.reduce((sum, pot) => sum + pot.revenue, 0),
+        totalRevenue: pots.reduce((sum, pot) => sum + (pot.revenue || 0), 0),
         activePots: pots.filter(p => p.status === 'active' || p.status === 'ending-soon').length,
-        totalEntries: pots.reduce((sum, pot) => sum + pot.totalEntries, 0),
+        totalEntries: pots.reduce((sum, pot) => sum + (pot.totalEntries || 0), 0),
         avgFillRate: pots.filter(p => p.status === 'active' || p.status === 'ending-soon').reduce((sum, pot) =>
-            sum + (pot.totalEntries / pot.maxEntries * 100), 0) /
+            sum + ((pot.totalEntries || 0) / (pot.maxEntries || 1) * 100), 0) /
             pots.filter(p => p.status === 'active' || p.status === 'ending-soon').length || 0
     };
 
@@ -215,13 +178,13 @@ const DashboardStats: React.FC<{ pots: Pot[] }> = ({ pots }) => {
 const PotFormModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
-    pot?: Pot;
-    onSave: (pot: Partial<Pot>) => void;
+    pot?: PotItem;
+    onSave: (pot: Partial<PotItem>) => void;
 }> = ({ isOpen, onClose, pot, onSave }) => {
     const [formData, setFormData] = useState({
         name: pot?.name || '',
         icon: pot?.icon || '🎁',
-        value: pot?.value || '',
+        prizeValue: pot?.prizeValue || '',
         description: pot?.description || '',
         status: pot?.status || 'upcoming',
         entryFee: pot?.entryFee || 249,
@@ -231,7 +194,7 @@ const PotFormModal: React.FC<{
     });
 
     const handleSubmit = () => {
-        if (!formData.name || !formData.value || !formData.description || !formData.drawDate) {
+        if (!formData.name || !formData.prizeValue || !formData.description || !formData.drawDate) {
             alert('Please fill in all required fields');
             return;
         }
@@ -288,8 +251,8 @@ const PotFormModal: React.FC<{
                         <label className="block text-sm font-medium text-gray-300 mb-2">Value (e.g., ₹1,20,000) *</label>
                         <input
                             type="text"
-                            value={formData.value}
-                            onChange={e => setFormData({ ...formData, value: e.target.value })}
+                            value={formData.prizeValue}
+                            onChange={e => setFormData({ ...formData, prizeValue: e.target.value })}
                             className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-yellow-500"
                         />
                     </div>
@@ -383,10 +346,10 @@ const PotFormModal: React.FC<{
 
 // Pots Table Component (Minimal status update)
 const PotsTable: React.FC<{
-    pots: Pot[];
-    onEdit: (pot: Pot) => void;
+    pots: PotItem[];
+    onEdit: (pot: PotItem) => void;
     onDelete: (id: number) => void;
-    onView: (pot: Pot) => void;
+    onView: (pot: PotItem) => void;
 }> = ({ pots, onEdit, onDelete, onView }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<PotStatus | 'all'>('all');
@@ -397,15 +360,15 @@ const PotsTable: React.FC<{
         return matchesSearch && matchesStatus;
     });
 
-    const getStatusBadge = (status: PotStatus) => {
-        const styles = {
+    const getStatusBadge = (status: string) => {
+        const styles: Record<string, string> = {
             active: 'bg-green-600/30 text-green-300 border-green-500',
             upcoming: 'bg-blue-600/30 text-blue-300 border-blue-500',
             'ending-soon': 'bg-red-600/30 text-red-300 border-red-500', // New style
             completed: 'bg-gray-600/30 text-gray-300 border-gray-500',
             cancelled: 'bg-red-600/30 text-red-300 border-red-500'
         };
-        return styles[status];
+        return styles[status] || styles['completed'];
     };
 
     return (
@@ -462,7 +425,7 @@ const PotsTable: React.FC<{
                                         <span className="text-3xl">{pot.icon}</span>
                                         <div>
                                             <p className="text-white font-semibold">{pot.name}</p>
-                                            <p className="text-xs text-gray-400">{pot.value}</p>
+                                            <p className="text-xs text-gray-400">{pot.prizeValue}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -477,13 +440,13 @@ const PotsTable: React.FC<{
                                         <div className="w-24 h-2 bg-gray-700 rounded-full mt-1 overflow-hidden">
                                             <div
                                                 className="h-full bg-gradient-to-r from-yellow-500 to-orange-500"
-                                                style={{ width: `${(pot.totalEntries / pot.maxEntries) * 100}%` }}
+                                                style={{ width: `${((pot.totalEntries || 0) / (pot.maxEntries || 1)) * 100}%` }}
                                             />
                                         </div>
                                     </div>
                                 </td>
                                 <td className="py-4 px-4">
-                                    <span className="text-green-400 font-bold">₹{pot.revenue.toLocaleString()}</span>
+                                    <span className="text-green-400 font-bold">₹{pot.revenue?.toLocaleString() || 0}</span>
                                 </td>
                                 <td className="py-4 px-4">
                                     <div className="flex items-center gap-2 text-gray-300">
@@ -562,13 +525,13 @@ const UserManagement: React.FC<{ users: User[], onView: (user: User) => void }> 
                             </td>
                             <td className="py-4 px-4">
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${user.status === 'active' ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
-                                    {user.status.toUpperCase()}
+                                    {user.status?.toUpperCase()}
                                 </span>
                             </td>
-                            <td className="py-4 px-4">₹{user.walletBalance.toLocaleString()}</td>
+                            <td className="py-4 px-4">₹{user.walletBalance?.toLocaleString()}</td>
                             <td className="py-4 px-4">
                                 <span className="text-white">{user.totalEntries} entries</span>
-                                <span className="block text-green-400 text-sm">₹{user.totalWinnings.toLocaleString()} won</span>
+                                <span className="block text-green-400 text-sm">₹{user.totalWinnings?.toLocaleString()} won</span>
                             </td>
                             <td className="py-4 px-4">
                                 <button
@@ -610,12 +573,12 @@ const FinancialManagement: React.FC<{ transactions: Transaction[] }> = ({ transa
             <div className="p-4 bg-gray-700/50 rounded-lg">
                 <p className="text-sm text-gray-400">Net Revenue</p>
                 {/* Changed text-xl to text-lg */}
-                <p className="text-lg font-bold text-yellow-300">₹{(MOCK_POTS.reduce((sum, p) => sum + p.revenue, 0) - MOCK_TRANSACTIONS.filter(t => t.type === 'win').reduce((sum, t) => sum + t.amount, 0)).toLocaleString()}</p>
+                <p className="text-lg font-bold text-yellow-300">₹{(MOCK_POTS.reduce((sum, p) => sum + (p.revenue || 0), 0) - MOCK_TRANSACTIONS.filter(t => t.type === 'win').reduce((sum, t) => sum + t.amount, 0)).toLocaleString()}</p>
             </div>
             <div className="p-4 bg-gray-700/50 rounded-lg">
                 <p className="text-sm text-gray-400">Active Wallet Balance</p>
                 {/* Changed text-xl to text-lg */}
-                <p className="text-lg font-bold text-blue-300">₹{MOCK_USERS.reduce((sum, u) => sum + u.walletBalance, 0).toLocaleString()}</p>
+                <p className="text-lg font-bold text-blue-300">₹{MOCK_USERS.reduce((sum, u) => sum + (u.walletBalance || 0), 0).toLocaleString()}</p>
             </div>
         </div>
 
@@ -797,15 +760,15 @@ const Sidebar: React.FC<{
 // Main Admin Dashboard Component
 export default function AdminDashboard() {
     const [admin, setAdmin] = useState<AdminUser | null>(null);
-    const [pots, setPots] = useState<Pot[]>(MOCK_POTS);
-    const [users, setUsers] = useState<User[]>(MOCK_USERS);
-    const [coupons, setCoupons] = useState<Coupon[]>(MOCK_COUPONS);
-    const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
-    const [tickets, setTickets] = useState<SupportTicket[]>(MOCK_TICKETS);
+    const [pots, setPots] = useState<PotItem[]>(MOCK_POTS);
+    const [users] = useState<User[]>(MOCK_USERS);
+    const [coupons] = useState<Coupon[]>(MOCK_COUPONS);
+    const [transactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
+    const [tickets] = useState<SupportTicket[]>(MOCK_TICKETS);
     const [currentView, setCurrentView] = useState<DashboardView>('home'); // State for navigation
 
     const [isPotFormOpen, setIsPotFormOpen] = useState(false);
-    const [editingPot, setEditingPot] = useState<Pot | undefined>();
+    const [editingPot, setEditingPot] = useState<PotItem | undefined>();
 
     // Mock login
     useEffect(() => {
@@ -818,25 +781,33 @@ export default function AdminDashboard() {
         setIsPotFormOpen(true);
     };
 
-    const handleEditPot = (pot: Pot) => {
+    const handleEditPot = (pot: PotItem) => {
         setEditingPot(pot);
         setIsPotFormOpen(true);
     };
 
-    const handleSavePot = (potData: Partial<Pot>) => {
+    const handleSavePot = (potData: Partial<PotItem>) => {
         if (editingPot) {
             setPots(pots.map(p => p.id === editingPot.id ? { ...p, ...potData } : p));
         } else {
             // Extract only the properties you want from potData, excluding id
             const { id, ...safePotData } = potData;
 
-            const newPot: Pot = {
+            const newPot: PotItem = {
                 id: pots.length > 0 ? Math.max(...pots.map(p => p.id)) + 1 : 1,
                 totalEntries: 0,
                 revenue: 0,
                 createdDate: new Date().toISOString().split('T')[0],
+                // Defaults for required fields
+                category: 'macbook',
+                type: 'Electronics',
+                filled: 0,
+                totalSlots: 1000,
+                remaining: 1000,
+                daysLeft: 30,
+                endDate: new Date().toISOString().split('T')[0],
                 ...safePotData
-            } as Pot;
+            } as PotItem;
             setPots([...pots, newPot]);
         }
         setIsPotFormOpen(false);
@@ -849,13 +820,13 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleViewPot = (pot: Pot) => {
+    const handleViewPot = (pot: PotItem) => {
         alert(`Viewing Pot Details: ${pot.name}`);
     };
 
     // User Handlers
     const handleViewUser = (user: User) => {
-        alert(`Viewing User Profile for: ${user.name} (ID: ${user.id})\n\nWallet Balance: ₹${user.walletBalance}\nReferral Code: ${user.referralCode}\nStatus: ${user.status.toUpperCase()}`);
+        alert(`Viewing User Profile for: ${user.name} (ID: ${user.id})\n\nWallet Balance: ₹${user.walletBalance}\nReferral Code: ${user.referralCode}\nStatus: ${user.status?.toUpperCase()}`);
     };
 
     // Coupon Handlers

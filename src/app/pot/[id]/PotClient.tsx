@@ -1,4 +1,3 @@
-// src/app/pot/[id]/PotClient.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -21,163 +20,19 @@ import {
     Ticket,
     Trophy,
     Crown,
-    Home,
     Wallet,
     User,
     ListOrdered,
     Link as LinkIcon,
-    Lock
+    Lock,
+    Menu,
+    X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PotItem, FAQItem } from "@/types";
+import { COUPON_PRICE } from '@/lib/potData';
 
-// Mock data structures
-interface FAQItem {
-    question: string;
-    answer: string;
-}
-
-interface MerchItem {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    costAfterCoupon: number;
-}
-
-interface PotItem {
-    id: number;
-    category: "gold" | "luxury" | "maldives" | "macbook" | "watch";
-    type: "Electronics" | "Travel" | "Financial";
-    name: string;
-    description: string;
-    prizeValue: string;
-    totalSlots: number;
-    filled: number;
-    remaining: number;
-    daysLeft: number;
-    endDate: string;
-    status: string;
-    prizeDetails: string[];
-    gallery: string[];
-    merchList: MerchItem[];
-    faqs: FAQItem[];
-    termsAndConditions: string[];
-    color: string;
-}
-
-const COUPON_PRICE = 499;
-
-// Mock pot data
-const mockPotData: PotItem[] = [
-    {
-        id: 1,
-        category: "macbook",
-        type: "Electronics",
-        name: "MacBook Air M3",
-        description: "Win the Latest MacBook Air with M3 Chip - Power Meets Elegance.",
-        prizeValue: "₹1,14,900",
-        totalSlots: 800,
-        filled: 589,
-        remaining: 211,
-        daysLeft: 6,
-        endDate: "15 November 2025",
-        status: "Active",
-        prizeDetails: [
-            "Apple M3 chip with 8-core CPU",
-            "13.6-inch Liquid Retina display",
-            "8GB unified memory, 256GB SSD",
-            "Up to 18 hours battery life",
-            "1080p FaceTime HD camera",
-            "MagSafe 3 charging port"
-        ],
-        gallery: [
-            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80",
-            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80",
-            "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80",
-            "https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=800&q=80"
-        ],
-        merchList: [
-            { id: 1, name: "Premium Laptop Sleeve", price: 499, image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&q=80", costAfterCoupon: 0 },
-            { id: 2, name: "Wireless Mouse & Pad", price: 499, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80", costAfterCoupon: 0 },
-            { id: 3, name: "USB-C Hub Adapter", price: 499, image: "https://images.unsplash.com/photo-1625948515291-69613efd103f?w=400&q=80", costAfterCoupon: 0 },
-            { id: 4, name: "Tech Organizer Pouch", price: 499, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80", costAfterCoupon: 0 }
-        ],
-        faqs: [
-            { question: "How many entries can I purchase?", answer: "You can purchase up to 5 entries per user to ensure fair participation." },
-            { question: "When will the winner be announced?", answer: "The draw closes on November 15, 2025, and the winner will be announced within 24 hours." }
-        ],
-        termsAndConditions: [
-            "Each entry purchased is non-refundable once confirmed.",
-            "Winners will be contacted via registered email within 24 hours of the draw.",
-            "The MacBook Air M3 will be delivered within 15 business days.",
-            "Royal Escape reserves the right to substitute an equivalent model if unavailable."
-        ],
-        color: "#6366F1"
-    },
-    {
-        id: 2,
-        category: "watch",
-        type: "Electronics",
-        name: "Apple Watch Ultra 2",
-        description: "Engineered for adventure, endurance, and fitness.",
-        prizeValue: "₹89,900",
-        totalSlots: 180,
-        filled: 135,
-        remaining: 45,
-        daysLeft: 10,
-        endDate: "12 November 2025",
-        status: "Active",
-        prizeDetails: [
-            "49mm Titanium Case with Ocean Band",
-            "S9 SiP chip for enhanced performance",
-            "36-hour battery life",
-            "Precision dual-frequency GPS"
-        ],
-        gallery: [
-            "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=800&q=80",
-            "https://images.unsplash.com/photo-1510017803434-a899398421b3?w=800&q=80"
-        ],
-        merchList: [
-            { id: 1, name: "Adventure Mug", price: 299, image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", costAfterCoupon: 0 }
-        ],
-        faqs: [
-            { question: "Is this the latest model?", answer: "Yes, this is the 2024 Apple Watch Ultra 2." }
-        ],
-        termsAndConditions: ["Limited to 5 entries per user."],
-        color: "#10B981"
-    },
-    {
-        id: 3,
-        category: "gold",
-        type: "Financial",
-        name: "24K Gold Coin",
-        description: "A 24K certified 10-gram gold coin - a timeless symbol of prosperity.",
-        prizeValue: "₹71,000",
-        totalSlots: 150,
-        filled: 90,
-        remaining: 60,
-        daysLeft: 8,
-        endDate: "10 November 2025",
-        status: "Active",
-        prizeDetails: [
-            "10g of 24K certified gold",
-            "Hallmarked and BIS-certified",
-            "Comes in secure tamper-proof packaging"
-        ],
-        gallery: [
-            "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800&q=80"
-        ],
-        merchList: [
-            { id: 1, name: "Royal Pouch", price: 199, image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&q=80", costAfterCoupon: 0 }
-        ],
-        faqs: [
-            { question: "Is the gold coin hallmarked?", answer: "Yes, it is 24K BIS-certified gold." }
-        ],
-        termsAndConditions: ["Gold purity verified by BIS."],
-        color: "#F59E0B"
-    }
-];
-
+// --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
 const IconMap: Record<string, React.ElementType> = {
     gold: Coins,
@@ -420,7 +275,7 @@ const PaymentModal = ({ onClose, potName, colors }: any) => {
                 setCountdown((prev) => {
                     if (prev <= 1) {
                         clearInterval(interval);
-                        window.location.href = "http://localhost:3000";
+                        window.location.href = "/";
                         return 0;
                     }
                     return prev - 1;
@@ -598,9 +453,9 @@ const RoyalEscapeHeader = ({
     onProfileClick?: (view: string) => void;
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Added for mobile menu
 
     // Mock user data - In production, this would come from your auth context/state
-    // You can pass this as a prop in production
     const user = { name: "Royal Escape", email: "user@example.com" };
     const isLoggedIn = true; // Set to false to show login/register buttons
 
@@ -739,6 +594,13 @@ const RoyalEscapeHeader = ({
                                 </button>
                             </>
                         )}
+                        {/* Mobile Menu Button - Added to match homepage */}
+                        <button
+                            className="md:hidden p-2"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        >
+                            {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -836,11 +698,11 @@ const InfoModal = ({
 
 // Main Component
 export default function PotClient({
-    pot = mockPotData[0],
-    relatedPots = mockPotData
+    pot,
+    relatedPots
 }: {
-    pot?: PotItem;
-    relatedPots?: PotItem[]
+    pot: PotItem;
+    relatedPots: PotItem[]
 }) {
     const [selectedMerch, setSelectedMerch] = useState<number | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -971,7 +833,7 @@ export default function PotClient({
                             <h2 className="text-2xl font-bold text-white">Prize Includes</h2>
                         </div>
                         <ul className="space-y-3">
-                            {pot.prizeDetails.map((d, idx) => (
+                            {pot.prizeDetails && pot.prizeDetails.map((d, idx) => (
                                 <FeatureItem key={idx} icon={CheckCircle} text={d} colors={colors} />
                             ))}
                         </ul>
@@ -991,7 +853,7 @@ export default function PotClient({
                     >
                         <h3 className="text-2xl font-bold mb-4 text-white">Prize Gallery</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            {pot.gallery.map((g, i) => (
+                            {pot.gallery && pot.gallery.map((g, i) => (
                                 <motion.div
                                     key={i}
                                     whileHover={{ scale: 1.03 }}
@@ -1015,7 +877,7 @@ export default function PotClient({
                         Secure Your Entry & Exclusive Merch
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {pot.merchList.map((merch) => {
+                        {pot.merchList && pot.merchList.map((merch) => {
                             const isSelected = selectedMerch === merch.id;
                             return (
                                 <motion.div
@@ -1085,7 +947,7 @@ export default function PotClient({
                     </h2>
                     <div className={`p-8 bg-gradient-to-br ${colors.gradient} rounded-2xl border ${colors.border} backdrop-blur-md`}>
                         <ul className="space-y-4 text-slate-200">
-                            {pot.termsAndConditions.map((term, i) => (
+                            {pot.termsAndConditions && pot.termsAndConditions.map((term, i) => (
                                 <li key={i} className="flex items-start gap-3">
                                     <CheckCircle className={`w-5 h-5 ${colors.text} mt-0.5 flex-shrink-0`} />
                                     <span>{term}</span>
@@ -1096,7 +958,7 @@ export default function PotClient({
                 </section>
 
                 {/* FAQ */}
-                <FAQ faqs={pot.faqs} colors={colors} />
+                {pot.faqs && <FAQ faqs={pot.faqs} colors={colors} />}
             </main>
 
             <style jsx global>{`

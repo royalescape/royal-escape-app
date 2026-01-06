@@ -1,41 +1,6 @@
 // lib/potData.ts (Refined Royal Escape Version)
 
-import { Laptop, Coins, Plane, Watch, Hotel, Sparkles } from "lucide-react";
-
-// --- Type Definitions ---
-export interface FAQItem {
-    question: string;
-    answer: string;
-}
-
-export interface MerchItem {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    costAfterCoupon: number;
-}
-
-export interface PotItem {
-    id: number;
-    category: "gold" | "luxury" | "maldives" | "macbook" | "watch";
-    type: "Electronics" | "Travel" | "Financial";
-    name: string;
-    description: string;
-    prizeValue: string;
-    totalSlots: number;
-    filled: number;
-    remaining: number;
-    daysLeft: number;
-    endDate: string;
-    status: string;
-    prizeDetails: string[];
-    gallery: string[];
-    merchList: MerchItem[];
-    faqs: FAQItem[];
-    termsAndConditions: string[];
-    color: string;
-}
+import { PotItem } from "@/types";
 
 // --- Constants ---
 export const COUPON_PRICE = 499;
@@ -47,6 +12,7 @@ export const potData: PotItem[] = [
         category: "macbook",
         type: "Electronics",
         name: "MacBook Air M3",
+        icon: "💻",
         description:
             "The newest MacBook Air M3 delivers exceptional performance, lightweight design, and all-day battery life — perfect for creators and professionals.",
         prizeValue: "₹1,24,900",
@@ -101,6 +67,7 @@ export const potData: PotItem[] = [
         category: "watch",
         type: "Electronics",
         name: "Apple Watch Ultra 2",
+        icon: "⌚",
         description:
             "Engineered for adventure, endurance, and fitness. The Apple Watch Ultra 2 features a titanium case, precision dual-frequency GPS, and an ultra-bright display.",
         prizeValue: "₹89,900",
@@ -155,6 +122,7 @@ export const potData: PotItem[] = [
         category: "gold",
         type: "Financial",
         name: "Gold Coin 10g",
+        icon: "🪙",
         description:
             "A 24K certified 10-gram gold coin — a timeless symbol of prosperity and luck.",
         prizeValue: "₹71,000",
@@ -207,6 +175,7 @@ export const potData: PotItem[] = [
         category: "luxury",
         type: "Travel",
         name: "Luxury Staycation",
+        icon: "🏨",
         description:
             "Enjoy a two-night stay at a 5-star resort with premium amenities, gourmet dining, and spa indulgence — perfect for a relaxing getaway.",
         prizeValue: "₹1,10,000",
@@ -259,6 +228,7 @@ export const potData: PotItem[] = [
         category: "maldives",
         type: "Travel",
         name: "Maldives Escape",
+        icon: "🏝️",
         description:
             "A 4-day, 3-night luxury escape to the Maldives — turquoise waters, private villas, and unforgettable experiences await.",
         prizeValue: "₹3,75,000",
@@ -308,6 +278,70 @@ export const potData: PotItem[] = [
         ],
         color: "#22D3EE", // Cyan accent
     },
+    // Adding Upcoming Pots
+    {
+        id: 6,
+        category: "macbook",
+        type: "Electronics",
+        name: "iPhone 16 Pro",
+        icon: "📱",
+        description: "Coming soon to Royal Escape draws!",
+        prizeValue: "₹1,60,000",
+        totalSlots: 1000,
+        filled: 0,
+        remaining: 1000,
+        daysLeft: 0,
+        endDate: "TBA",
+        status: "Upcoming",
+        prizeDetails: [],
+        gallery: [],
+        merchList: [],
+        faqs: [],
+        termsAndConditions: [],
+        color: "#6366F1"
+    },
+    {
+        id: 7,
+        category: "luxury",
+        type: "Travel",
+        name: "Dubai Luxury Trip",
+        icon: "✈️",
+        description: "An exclusive travel experience awaits.",
+        prizeValue: "₹2,00,000",
+        totalSlots: 500,
+        filled: 0,
+        remaining: 500,
+        daysLeft: 0,
+        endDate: "TBA",
+        status: "Upcoming",
+        prizeDetails: [],
+        gallery: [],
+        merchList: [],
+        faqs: [],
+        termsAndConditions: [],
+        color: "#F97316"
+    },
+    {
+        id: 8,
+        category: "watch",
+        type: "Electronics",
+        name: "Swiss Watch Collection",
+        icon: "⌚",
+        description: "Timeless elegance for the lucky winner.",
+        prizeValue: "₹3,00,000",
+        totalSlots: 300,
+        filled: 0,
+        remaining: 300,
+        daysLeft: 0,
+        endDate: "TBA",
+        status: "Upcoming",
+        prizeDetails: [],
+        gallery: [],
+        merchList: [],
+        faqs: [],
+        termsAndConditions: [],
+        color: "#4ADE80"
+    }
 ];
 
 // --- Helper Functions ---
@@ -321,3 +355,13 @@ export const getPotData = (id: number) => {
 export const getPotsByType = (type: PotItem["type"]) => {
     return potData.filter((p) => p.type === type);
 };
+
+// Get active pots
+export const getActivePots = () => {
+    return potData.filter(p => p.status === 'Active');
+}
+
+// Get upcoming pots
+export const getUpcomingPots = () => {
+    return potData.filter(p => p.status === 'Upcoming');
+}
