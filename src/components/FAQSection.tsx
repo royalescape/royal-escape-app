@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 const faqs = [
     {
         question: "1. How does Royal Escape work?",
-        answer: "Royal Escape is a luxury reward platform where you purchase an entry into a prize draw and receive a merchandise gift. The flow is simple: **1. Choose** one of the 10 Live Luxury Pots you wish to win. **2. Pay** the entry fee of **₹249**. **3. Select** your free or discounted merchandise gift to complete the purchase. You are then entered into the draw."
+        answer: "Royal Escape is a luxury reward platform where you purchase an entry into a prize draw and receive a merchandise gift. The flow is simple: 1. **Choose** one of the 10 Live Luxury Pots you wish to win. 2. **Pay** the entry fee of **₹249**. 3. **Select** your free or discounted merchandise gift to complete the purchase. You are then entered into the draw."
     },
     {
         question: "2. What is the fixed cost of an entry?",
@@ -15,7 +15,7 @@ const faqs = [
     },
     {
         question: "3. What do I receive with my ₹249 Entry Ticket?",
-        answer: "Your ₹249 purchase secures two things: **1. One unique entry** into the specific Luxury Pot draw you selected. **2. A ₹249 coupon** that you must apply to a merch item. This makes our base merchandise items free, or provides a significant discount on premium items."
+        answer: "Your ₹249 purchase secures two things: 1. **One unique entry** into the specific Luxury Pot draw you selected. 2. **A ₹249 coupon** that you must apply to a merch item. This makes our base merchandise items free, or provides a significant discount on premium items."
     },
     {
         question: "4. How does the Free/Discounted Merch Gift work?",
@@ -56,6 +56,23 @@ export default function FAQSection() {
 
     // Show only first 4 FAQs on homepage
     const previewFaqs = faqs.slice(0, 4);
+
+    // Helper function to parse markdown-style bold (**text**) and apply styling
+    const parseAnswer = (text: string) => {
+        const parts = text.split(/(\*\*.*?\*\*)/g);
+        return parts.map((part, index) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                // Remove the asterisks and apply the highlight class
+                const content = part.slice(2, -2);
+                return (
+                    <span key={index} className="text-yellow-400 font-semibold">
+                        {content}
+                    </span>
+                );
+            }
+            return <span key={index}>{part}</span>;
+        });
+    };
 
     return (
         <>
@@ -107,10 +124,9 @@ export default function FAQSection() {
                                             exit={{ opacity: 0, height: 0 }}
                                             transition={{ duration: 0.35, ease: "easeInOut" }}
                                         >
-                                            <div
-                                                className="px-6 pb-6 text-gray-300 text-sm md:text-base leading-relaxed"
-                                                dangerouslySetInnerHTML={{ __html: faq.answer }}
-                                            />
+                                            <div className="px-6 pb-6 text-gray-300 text-sm md:text-base leading-relaxed">
+                                                {parseAnswer(faq.answer)}
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -215,10 +231,9 @@ export default function FAQSection() {
                                                         exit={{ opacity: 0, height: 0 }}
                                                         transition={{ duration: 0.35, ease: "easeInOut" }}
                                                     >
-                                                        <div
-                                                            className="px-6 pb-6 text-gray-300 text-sm md:text-base leading-relaxed"
-                                                            dangerouslySetInnerHTML={{ __html: faq.answer }}
-                                                        />
+                                                        <div className="px-6 pb-6 text-gray-300 text-sm md:text-base leading-relaxed">
+                                                            {parseAnswer(faq.answer)}
+                                                        </div>
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
