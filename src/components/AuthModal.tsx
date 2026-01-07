@@ -118,7 +118,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode, onA
                     {isSignUp ? (
                         <span>Already have an account?{' '}<button onClick={() => setMode('signin')} className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors">Sign In</button></span>
                     ) : (
-                        <span>Don't have an account?{' '}<button onClick={() => setMode('signup')} className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors">Sign Up</button></span>
+                        <span>Don&apos;t have an account?{' '}<button onClick={() => setMode('signup')} className="text-yellow-500 font-semibold hover:text-yellow-400 transition-colors">Sign Up</button></span>
                     )}
                 </div>
             </div>
