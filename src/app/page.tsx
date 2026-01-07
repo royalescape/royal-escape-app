@@ -230,10 +230,10 @@ export default function RoyalEscapeHome() {
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {livePots.map(pot => (
-                            <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
+                            <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300 flex flex-col h-full">
                                 <div className="text-6xl mb-4">{pot.icon}</div>
                                 <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
-                                <p className="text-gray-400 mb-3">{pot.description}</p>
+                                <p className="text-gray-400 mb-3 flex-grow">{pot.description}</p>
                                 <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
                                 <button
                                     onClick={() => handlePotClick(pot.id)}
