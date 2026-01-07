@@ -8,6 +8,7 @@ export const userService = {
             id: userId,
             name: "Rohan Doshi",
             email: "rohan@example.com",
+            mobile: "9876543210", // Added mobile
             walletBalance: 156,
             totalEntries: 8,
             totalWinnings: 0,

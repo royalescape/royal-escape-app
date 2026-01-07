@@ -345,22 +345,9 @@ export default function RoyalEscapeHome() {
                                 <>
                                     <button
                                         onClick={() => openAuthModal('signin')}
-                                        className="px-3 sm:px-5 py-1.5 sm:py-2 border border-yellow-400 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-all text-sm sm:text-base whitespace-nowrap"
+                                        className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap"
                                     >
-                                        Login
-                                    </button>
-                                    <button
-                                        onClick={() => openAuthModal('signup')}
-                                        className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap hidden sm:block"
-                                    >
-                                        REGISTER
-                                    </button>
-                                     {/* Mobile Register (Icon or shorter text) - Keeping distinct for clarity */}
-                                     <button
-                                        onClick={() => openAuthModal('signup')}
-                                        className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm whitespace-nowrap sm:hidden"
-                                    >
-                                        JOIN
+                                        LOGIN
                                     </button>
                                 </>
                             )}
