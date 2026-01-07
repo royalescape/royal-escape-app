@@ -723,16 +723,13 @@ export default function PotClient({
     pot: PotItem;
     relatedPots: PotItem[]
 }) {
-    const [selectedMerch, setSelectedMerch] = useState<number | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null>(null);
 
     const handlePurchase = async () => {
-        if (selectedMerch !== null) {
-             // In a real implementation, you would trigger the payment API here
-             // await api.payment.createSession({ potId: pot.id, merchId: selectedMerch });
-            setIsPaymentModalOpen(true);
-        }
+         // In a real implementation, you would trigger the payment API here
+         // await api.payment.createSession({ potId: pot.id });
+        setIsPaymentModalOpen(true);
     };
 
     const handleWalletClick = () => {
@@ -894,72 +891,42 @@ export default function PotClient({
                     </motion.div>
                 </div>
 
-                {/* Merchandise Section */}
-                <section id="merch" className="mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-10">
-                        Secure Your Entry & Exclusive Merch
+                {/* Merchandise Section (Removed Selection Logic, Display Only if needed, or repurposed) */}
+                {/* Simplified Purchase Section */}
+                <section id="purchase" className="mb-16 text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-6">
+                        Enter the Draw
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {pot.merchList && pot.merchList.map((merch) => {
-                            const isSelected = selectedMerch === merch.id;
-                            return (
-                                <motion.div
-                                    key={merch.id}
-                                    onClick={() => setSelectedMerch(merch.id)}
-                                    whileHover={{ scale: 1.03 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className={`cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 backdrop-blur-md
-                                        ${isSelected
-                                            ? `${colors.border} bg-gradient-to-br ${colors.gradient} shadow-2xl ${colors.glow}`
-                                            : "border-slate-700 bg-slate-800/40 hover:border-slate-600"
-                                        }`}
-                                >
-                                    <div className="relative mb-4">
-                                        <img
-                                            src={merch.image}
-                                            alt={merch.name}
-                                            className="w-full h-48 object-cover rounded-xl"
-                                        />
-                                        {isSelected && (
-                                            <motion.div
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br ${colors.button} flex items-center justify-center`}
-                                            >
-                                                <CheckCircle className="w-5 h-5 text-white" />
-                                            </motion.div>
-                                        )}
-                                    </div>
-                                    <h3 className="text-lg font-semibold text-white mb-2">{merch.name}</h3>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-slate-400 line-through">₹{merch.price}</span>
-                                        {merch.costAfterCoupon === 0 && (
-                                            <span className={`${colors.text} font-bold`}>FREE</span>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-slate-400 mt-1">Includes 1 Entry Coupon</p>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="mt-12 text-center">
-                        <motion.button
-                            onClick={handlePurchase}
-                            disabled={!selectedMerch}
-                            whileHover={{ scale: selectedMerch ? 1.05 : 1 }}
-                            whileTap={{ scale: selectedMerch ? 0.95 : 1 }}
-                            className={`px-12 py-5 text-xl font-black rounded-full transition-all duration-300 shadow-2xl
-                                ${selectedMerch
-                                    ? `bg-gradient-to-r ${colors.button} text-white hover:shadow-3xl ${colors.glow}`
-                                    : "bg-slate-700 text-slate-400 cursor-not-allowed opacity-50"
-                                }`}
-                        >
-                            <div className="flex items-center gap-3 justify-center">
-                                <Ticket className="w-6 h-6" />
-                                {selectedMerch ? `BUY & GET ENTRY for ₹${COUPON_PRICE}` : "Select Merchandise to Continue"}
+                    
+                     <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-8 border border-slate-700 max-w-2xl mx-auto backdrop-blur-md">
+                        <div className="flex flex-col items-center gap-6">
+                            <div className="p-4 bg-yellow-400/10 rounded-full border border-yellow-400/30">
+                                <Ticket className="w-12 h-12 text-yellow-400" />
                             </div>
-                        </motion.button>
+                            
+                            <div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Secure Your Entry Ticket</h3>
+                                <p className="text-slate-300">
+                                    Purchase your entry for <span className="text-white font-bold">₹{COUPON_PRICE}</span> and get a chance to win the <span className="text-yellow-400 font-bold">{pot.name}</span>.
+                                </p>
+                            </div>
+
+                            <motion.button
+                                onClick={handlePurchase}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`px-12 py-5 text-xl font-black rounded-full transition-all duration-300 shadow-2xl bg-gradient-to-r ${colors.button} text-white hover:shadow-3xl ${colors.glow} w-full sm:w-auto`}
+                            >
+                                <div className="flex items-center gap-3 justify-center">
+                                    <Ticket className="w-6 h-6" />
+                                    PAY ₹{COUPON_PRICE} & JOIN
+                                </div>
+                            </motion.button>
+                            
+                            <p className="text-xs text-slate-500">
+                                * By proceeding, you agree to our Terms & Conditions.
+                            </p>
+                        </div>
                     </div>
                 </section>
 
