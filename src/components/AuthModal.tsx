@@ -61,8 +61,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 await authService.sendOtp(mobile);
                 setStep(2);
             }
-        } catch (err: any) {
-            setError(err.message || "Failed to verify mobile number.");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Failed to verify mobile number.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -83,8 +87,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 // OTP verified, move to PIN setup
                 setStep(3);
             }
-        } catch (err: any) {
-            setError(err.message || "Invalid OTP.");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Invalid OTP.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -108,8 +116,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 const user = await authService.loginWithPin(mobile, pin);
                 handleSuccess(user);
             }
-        } catch (err: any) {
-            setError(err.message || "Authentication failed.");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Authentication failed.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -126,8 +138,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             // Register new user
             const user = await authService.register(name, mobile, pin);
             handleSuccess(user);
-        } catch (err: any) {
-            setError(err.message || "Registration failed.");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Registration failed.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -291,3 +307,4 @@ const Button = ({ isLoading, text }: { isLoading: boolean, text: string }) => (
 );
 
 export default AuthModal;
+
