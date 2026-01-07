@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     Users,
     Clock,
@@ -499,29 +500,35 @@ const RoyalEscapeHeader = ({
         <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
+                    {/* Logo - Flex grow allows it to take available space */}
                     <button
                         onClick={handleHomeClick}
-                        className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
+                        className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0 mr-4"
                     >
-                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                            <Crown className="w-6 h-6 text-black" />
+                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center p-0.5 overflow-hidden flex-shrink-0">
+                            <Image 
+                                src="/logo.png" 
+                                alt="Royal Escape Logo" 
+                                width={40} 
+                                height={40} 
+                                className="w-full h-full object-cover rounded-full"
+                            />
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+                        <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent truncate max-w-[150px] sm:max-w-none">
                             Royal Escape
                         </span>
                     </button>
 
                     {/* Right Side Buttons */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         {isLoggedIn ? (
                             <>
                                 {/* Wallet Button */}
                                 <button
                                     onClick={handleWalletClick}
-                                    className="flex items-center gap-1 px-3 py-2 border border-green-500 text-green-400 font-semibold rounded-lg hover:bg-green-500/10 transition-all"
+                                    className="flex items-center gap-1 px-2 sm:px-3 py-2 border border-green-500 text-green-400 font-semibold rounded-lg hover:bg-green-500/10 transition-all text-sm sm:text-base"
                                 >
-                                    <Wallet className="w-5 h-5" />
+                                    <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="hidden sm:inline">Add Money</span>
                                 </button>
 
@@ -529,7 +536,7 @@ const RoyalEscapeHeader = ({
                                 <div className="relative">
                                     <button
                                         onClick={() => setIsProfileDropdownOpen(prev => !prev)}
-                                        className="flex items-center justify-center w-10 h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400"
+                                        className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400 text-sm sm:text-base"
                                     >
                                         {user.name.charAt(0).toUpperCase()}
                                     </button>
@@ -587,24 +594,31 @@ const RoyalEscapeHeader = ({
                             <>
                                 <button
                                     onClick={() => handleAuthClick('signin')}
-                                    className="px-5 py-2 border border-yellow-400 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-all"
+                                    className="px-3 sm:px-5 py-1.5 sm:py-2 border border-yellow-400 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-all text-sm sm:text-base whitespace-nowrap"
                                 >
                                     Login
                                 </button>
                                 <button
                                     onClick={() => handleAuthClick('signup')}
-                                    className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all"
+                                    className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap hidden sm:block"
                                 >
                                     REGISTER
+                                </button>
+                                 {/* Mobile Register (Icon or shorter text) - Keeping distinct for clarity */}
+                                 <button
+                                    onClick={() => handleAuthClick('signup')}
+                                    className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm whitespace-nowrap sm:hidden"
+                                >
+                                    JOIN
                                 </button>
                             </>
                         )}
                         {/* Mobile Menu Button - Added to match homepage */}
                         <button
-                            className="md:hidden p-2"
+                            className="md:hidden p-1.5 sm:p-2"
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         >
-                            {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+                            {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
                         </button>
                     </div>
                 </div>
