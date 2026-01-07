@@ -62,7 +62,7 @@ export interface User {
     role?: 'user' | 'admin' | 'super-admin';
 }
 
-export type View = 'home' | 'personalInfo' | 'myOrders' | 'myWallet' | 'myReferrals';
+export type View = 'home' | 'personalInfo' | 'myOrders' | 'myReferrals';
 
 export interface Coupon {
     id: number;

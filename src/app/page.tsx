@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
-    Sparkles, Trophy, Instagram, Facebook, MessageCircle, Menu, X, Wallet,
+    Sparkles, Trophy, Instagram, Facebook, MessageCircle, Menu, X,
     User as UserIcon, ListOrdered, Link, Lock, Gift, Crown
 } from 'lucide-react';
 
@@ -142,8 +142,6 @@ export default function RoyalEscapeHome() {
                 return <MyReferrals user={user} />;
             case 'myOrders':
                 return <MyDashboard user={user} />;
-            case 'myWallet':
-                return <section className="max-w-4xl mx-auto py-12 px-4 text-center text-white"><h2 className="text-4xl font-bold mb-4 text-yellow-400">My Wallet</h2><p className="text-lg text-gray-400">Manage your Royal Escape funds here. Current Balance: **₹0**</p><p className="mt-8 text-sm text-gray-500">Feature implementation pending. Click &apos;Add Money&apos; in the header to navigate here when developed.</p></section>;
             case 'home':
             default:
                 // Home view content, which handles the Hero/Summary swap internally
@@ -300,15 +298,6 @@ export default function RoyalEscapeHome() {
                         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                             {user ? (
                                 <>
-                                    {/* Wallet Button (Navigates to myWallet view) */}
-                                    <button
-                                        onClick={() => handleViewChange('myWallet')}
-                                        className="flex items-center gap-1 px-2 sm:px-3 py-2 border border-green-500 text-green-400 font-semibold rounded-lg hover:bg-green-500/10 transition-all text-sm sm:text-base"
-                                    >
-                                        <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        <span className="hidden sm:inline">Add Money</span>
-                                    </button>
-
                                     {/* Profile Dropdown */}
                                     <div className="relative">
                                         <button
@@ -328,12 +317,6 @@ export default function RoyalEscapeHome() {
                                                     className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
                                                 >
                                                     <ListOrdered className="w-4 h-4 mr-2" /> My Dashboard
-                                                </button>
-                                                <button
-                                                    onClick={() => handleViewChange('myWallet')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <Wallet className="w-4 h-4 mr-2" /> My Wallet
                                                 </button>
                                                 <button
                                                     onClick={() => handleViewChange('personalInfo')}

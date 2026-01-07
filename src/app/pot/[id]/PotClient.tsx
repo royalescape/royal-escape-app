@@ -21,7 +21,6 @@ import {
     Ticket,
     Trophy,
     Crown,
-    Wallet,
     User,
     ListOrdered,
     Link as LinkIcon,
@@ -448,10 +447,8 @@ const PaymentModal = ({ onClose, potName, colors }: any) => {
 
 // Royal Escape Header Component (Matches Homepage)
 const RoyalEscapeHeader = ({
-    onWalletClick,
     onProfileClick
 }: {
-    onWalletClick?: () => void;
     onProfileClick?: (view: string) => void;
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -463,14 +460,6 @@ const RoyalEscapeHeader = ({
 
     const handleHomeClick = () => {
         window.location.href = '/';
-    };
-
-    const handleWalletClick = () => {
-        if (onWalletClick) {
-            onWalletClick();
-        } else {
-            window.location.href = '/?view=myWallet';
-        }
     };
 
     const handleProfileOption = (view: string) => {
@@ -523,15 +512,6 @@ const RoyalEscapeHeader = ({
                     <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         {isLoggedIn ? (
                             <>
-                                {/* Wallet Button */}
-                                <button
-                                    onClick={handleWalletClick}
-                                    className="flex items-center gap-1 px-2 sm:px-3 py-2 border border-green-500 text-green-400 font-semibold rounded-lg hover:bg-green-500/10 transition-all text-sm sm:text-base"
-                                >
-                                    <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    <span className="hidden sm:inline">Add Money</span>
-                                </button>
-
                                 {/* Profile Dropdown */}
                                 <div className="relative">
                                     <button
@@ -559,12 +539,6 @@ const RoyalEscapeHeader = ({
                                                     className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
                                                 >
                                                     <ListOrdered className="w-4 h-4 mr-2" /> My Dashboard
-                                                </button>
-                                                <button
-                                                    onClick={() => handleProfileOption('myWallet')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <Wallet className="w-4 h-4 mr-2" /> My Wallet
                                                 </button>
                                                 <button
                                                     onClick={() => handleProfileOption('personalInfo')}
@@ -635,16 +609,9 @@ const InfoModal = ({
     type: 'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null;
     onClose: () => void;
 }) => {
-    if (!type) return null;
+    if (!type || type === 'wallet') return null;
 
     const modalContent = {
-        wallet: {
-            title: 'My Wallet',
-            icon: Wallet,
-            color: 'green',
-            message: 'Add funds to your Royal Escape wallet to participate in draws and purchase entries.',
-            note: 'Visit the main dashboard to manage your wallet and view transaction history.'
-        },
         dashboard: {
             title: 'My Dashboard',
             icon: Trophy,
@@ -667,7 +634,8 @@ const InfoModal = ({
             note: 'Visit the main dashboard to view your referral statistics and earnings.'
         }
     };
-
+    
+    // @ts-ignore
     const content = modalContent[type];
     const IconComponent = content.icon;
 
@@ -732,17 +700,13 @@ export default function PotClient({
         setIsPaymentModalOpen(true);
     };
 
-    const handleWalletClick = () => {
-        setInfoModalType('wallet');
-    };
-
     const handleProfileClick = (view: string) => {
-        const modalMap: Record<string, 'wallet' | 'dashboard' | 'personalInfo' | 'referrals'> = {
+        const modalMap: Record<string, 'dashboard' | 'personalInfo' | 'referrals'> = {
             'myOrders': 'dashboard',
-            'myWallet': 'wallet',
             'personalInfo': 'personalInfo',
             'myReferrals': 'referrals'
         };
+        // @ts-ignore
         setInfoModalType(modalMap[view]);
     };
 
@@ -759,7 +723,6 @@ export default function PotClient({
 
             {/* Royal Escape Header */}
             <RoyalEscapeHeader
-                onWalletClick={handleWalletClick}
                 onProfileClick={handleProfileClick}
             />
 

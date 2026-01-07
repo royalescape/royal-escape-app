@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Crown, Trophy, Wallet, Gift, Sparkles } from 'lucide-react';
+import { Crown, Trophy, Gift, Sparkles } from 'lucide-react';
 import { User, View } from '@/types';
 import { api } from '@/services/api';
 
@@ -46,7 +46,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                 </p>
 
                 {/* Summary Stats Grid - Added onClick and styling to each stat block */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                     <div
                         onClick={() => handleViewChange('myOrders')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
@@ -54,14 +54,6 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                         <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-2" />
                         <p className="text-3xl font-bold text-blue-400">{stats.activeEntries}</p>
                         <p className="text-xs text-gray-400">Active Entries</p>
-                    </div>
-                    <div
-                        onClick={() => handleViewChange('myWallet')}
-                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
-                    >
-                        <Wallet className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                        <p className="text-3xl font-bold text-green-400">₹{stats.walletBalance}</p>
-                        <p className="text-xs text-gray-400">Wallet Balance</p>
                     </div>
                     <div
                         onClick={() => handleViewChange('myReferrals')}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Trophy, Wallet, Sparkles, Gift } from 'lucide-react';
+import { Trophy, Sparkles, Gift } from 'lucide-react';
 import { User, Transaction } from '@/types';
 import { api } from '@/services/api';
 
@@ -73,7 +73,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-2">
                         <Trophy className="w-8 h-8 text-blue-400" />
@@ -81,15 +81,6 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                     </div>
                     <p className="text-sm text-gray-300 font-medium">Active Entries</p>
                     <p className="text-xs text-gray-500 mt-1">Currently in the draw</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <Wallet className="w-8 h-8 text-green-400" />
-                        <span className="text-2xl font-bold text-green-400">₹{stats.walletBalance}</span>
-                    </div>
-                    <p className="text-sm text-gray-300 font-medium">Wallet Balance</p>
-                    <p className="text-xs text-gray-500 mt-1">Available funds</p>
                 </div>
 
                 <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
@@ -214,7 +205,6 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
                     <span>Recent Transactions</span>
-                    <Wallet className="w-5 h-5 text-yellow-400" />
                 </h3>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-700">
