@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Crown, Trophy, Wallet, Gift, Sparkles } from 'lucide-react';
 import { User, View } from '@/types';
+import { api } from '@/services/api';
 
 interface UserDashboardSummaryProps {
     user: User;
@@ -10,13 +11,28 @@ interface UserDashboardSummaryProps {
 }
 
 const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handleViewChange }) => {
-    // Mock Data (consistent with MyDashboard component)
-    const stats = {
-        activeEntries: 5,
-        walletBalance: 156,
-        referralEarnings: 75,
-        totalTickets: 8
-    };
+    // New State for stats
+    const [stats, setStats] = useState({
+        activeEntries: 0,
+        walletBalance: 0,
+        referralEarnings: 0,
+        totalTickets: 0
+    });
+    
+    // Fetch stats on mount
+    useEffect(() => {
+        const fetchStats = async () => {
+             if (user.id) {
+                 try {
+                     const data = await api.user.getDashboardStats(user.id);
+                     setStats(data);
+                 } catch (error) {
+                     console.error("Failed to fetch dashboard stats", error);
+                 }
+             }
+        };
+        fetchStats();
+    }, [user.id]);
 
     return (
         <section className="relative py-12 px-4 overflow-hidden bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-b border-gray-700">

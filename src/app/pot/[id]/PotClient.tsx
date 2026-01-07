@@ -31,6 +31,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { PotItem, FAQItem } from "@/types";
 import { COUPON_PRICE } from '@/lib/potData';
+import { api } from "@/services/api";
 
 // --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
@@ -480,10 +481,14 @@ const RoyalEscapeHeader = ({
         }
     };
 
-    const handleSignOut = () => {
-        // In production, clear auth state here
-        localStorage.removeItem('royalEscapeUser');
-        window.location.href = '/';
+    const handleSignOut = async () => {
+        try {
+            await api.auth.logout();
+            localStorage.removeItem('royalEscapeUser');
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     };
 
     const handleAuthClick = (mode: 'signin' | 'signup') => {
@@ -708,8 +713,12 @@ export default function PotClient({
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null>(null);
 
-    const handlePurchase = () => {
-        if (selectedMerch !== null) setIsPaymentModalOpen(true);
+    const handlePurchase = async () => {
+        if (selectedMerch !== null) {
+             // In a real implementation, you would trigger the payment API here
+             // await api.payment.createSession({ potId: pot.id, merchId: selectedMerch });
+            setIsPaymentModalOpen(true);
+        }
     };
 
     const handleWalletClick = () => {

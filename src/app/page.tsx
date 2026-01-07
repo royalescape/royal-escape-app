@@ -13,8 +13,9 @@ import MyReferrals from "@/components/MyReferrals";
 import MyPersonalInfo from "@/components/MyPersonalInfo";
 import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
-import { User, View } from '@/types';
-import { getActivePots, getUpcomingPots, COUPON_PRICE } from '@/lib/potData';
+import { User, View, PotItem } from '@/types';
+import { api } from '@/services/api';
+import { COUPON_PRICE } from '@/lib/potData';
 
 // --- Main Application Component ---
 export default function RoyalEscapeHome() {
@@ -29,6 +30,11 @@ export default function RoyalEscapeHome() {
 
     // NEW STATE: For internal routing
     const [currentView, setCurrentView] = useState<View>('home');
+    
+    // NEW STATE: For data fetching
+    const [livePots, setLivePots] = useState<PotItem[]>([]);
+    const [comingSoonPots, setComingSoonPots] = useState<PotItem[]>([]);
+    const [isLoadingPots, setIsLoadingPots] = useState(true);
 
     // 🚩 EFFECT: Load user state from local storage on mount (Persistence Fix)
     useEffect(() => {
@@ -43,6 +49,30 @@ export default function RoyalEscapeHome() {
             setUser(null);
         }
     }, []);
+
+    // 🚩 EFFECT: Fetch Pots Data
+    useEffect(() => {
+        const fetchPots = async () => {
+            setIsLoadingPots(true);
+            try {
+                // Fetch data in parallel
+                const [active, upcoming] = await Promise.all([
+                    api.pots.getActive(),
+                    api.pots.getUpcoming()
+                ]);
+                setLivePots(active);
+                setComingSoonPots(upcoming);
+            } catch (error) {
+                console.error("Failed to fetch pots:", error);
+                // In a real app, set an error state here to show a retry button or message
+            } finally {
+                setIsLoadingPots(false);
+            }
+        };
+
+        fetchPots();
+    }, []);
+
 
     const openAuthModal = useCallback((mode: 'signin' | 'signup') => {
         setAuthMode(mode);
@@ -98,10 +128,6 @@ export default function RoyalEscapeHome() {
             openAuthModal('signin');
         }
     };
-
-    // --- Data (fetched from lib) ---
-    const livePots = getActivePots();
-    const comingSoonPots = getUpcomingPots();
 
     // --- Conditional Rendering based on View State ---
 

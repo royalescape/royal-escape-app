@@ -1,24 +1,50 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trophy, Wallet, Sparkles, Gift } from 'lucide-react';
-import { User } from '@/types';
+import { User, Transaction } from '@/types';
+import { api } from '@/services/api';
 
 interface MyDashboardProps {
     user: User;
 }
 
 const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
-    // Mock Data
-    const stats = {
-        activeEntries: 5,
-        totalSpent: 1245,
+    // State for stats and transactions
+    const [stats, setStats] = useState({
+        activeEntries: 0,
+        totalSpent: 0,
         totalWinnings: 0,
-        walletBalance: 156,
-        referralEarnings: 75,
-        totalTickets: 8
-    };
+        walletBalance: 0,
+        referralEarnings: 0,
+        totalTickets: 0
+    });
+    const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+             if (user.id) {
+                 setIsLoading(true);
+                 try {
+                     const [statsData, txnData] = await Promise.all([
+                         api.user.getDashboardStats(user.id),
+                         api.user.getTransactions(user.id)
+                     ]);
+                     setStats(statsData);
+                     setRecentTransactions(txnData);
+                 } catch (error) {
+                     console.error("Failed to fetch dashboard data", error);
+                 } finally {
+                     setIsLoading(false);
+                 }
+             }
+        };
+
+        fetchDashboardData();
+    }, [user.id]);
+
+    // Mock Data for entries/draws (can be moved to API later)
     const recentEntries = [
         { id: 'RE-1001', date: '2024-10-25', pot: 'MacBook Air M3', status: 'Active', drawDate: '2024-11-15', tickets: 1 },
         { id: 'RE-1002', date: '2024-10-20', pot: 'Gold Coin', status: 'Active', drawDate: '2024-11-10', tickets: 1 },
@@ -31,12 +57,9 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
         { pot: 'Luxury Staycation', drawDate: '2024-11-20', daysLeft: 18, yourTickets: 2 },
     ];
 
-    const recentTransactions = [
-        { id: 'TXN-5001', type: 'Entry Purchase', amount: -249, date: '2024-10-25', description: 'MacBook Air M3 Entry' },
-        { id: 'TXN-5002', type: 'Referral Bonus', amount: 50, date: '2024-10-22', description: 'Friend signup bonus' },
-        { id: 'TXN-5003', type: 'Wallet Top-up', amount: 500, date: '2024-10-20', description: 'Added funds' },
-        { id: 'TXN-5004', type: 'Entry Purchase', amount: -249, date: '2024-10-20', description: 'Gold Coin Entry' },
-    ];
+    if (isLoading) {
+         return <div className="text-center py-20 text-white">Loading Dashboard...</div>;
+    }
 
     return (
         <section className="max-w-7xl mx-auto py-8 px-4">
@@ -216,6 +239,13 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                                     </td>
                                 </tr>
                             ))}
+                            {recentTransactions.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="py-6 text-center text-gray-500">
+                                        No transactions found.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
