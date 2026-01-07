@@ -635,7 +635,6 @@ const InfoModal = ({
         }
     };
     
-    // @ts-ignore
     const content = modalContent[type];
     const IconComponent = content.icon;
 
@@ -706,7 +705,6 @@ export default function PotClient({
             'personalInfo': 'personalInfo',
             'myReferrals': 'referrals'
         };
-        // @ts-ignore
         setInfoModalType(modalMap[view]);
     };
 
