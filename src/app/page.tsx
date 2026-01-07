@@ -444,8 +444,8 @@ export default function RoyalEscapeHome() {
                     <a href="https://www.instagram.com/royale_escape/" target="_blank" rel="noopener noreferrer">
                         <Instagram className="w-6 h-6 text-pink-400 hover:scale-110 transition-transform" />
                     </a>
-                    <a href="#"><Facebook className="w-6 h-6 text-blue-400 hover:scale-110 transition-transform" /></a>
-                    <a href="#"><MessageCircle className="w-6 h-6 text-sky-400 hover:scale-110 transition-transform" /></a>
+                    {/* <a href="#"><Facebook className="w-6 h-6 text-blue-400 hover:scale-110 transition-transform" /></a>
+                    <a href="#"><MessageCircle className="w-6 h-6 text-sky-400 hover:scale-110 transition-transform" /></a> */}
                 </div>
                 <p className="text-gray-500 text-sm">
                     © 2025 Royal Escape. All rights reserved. |
