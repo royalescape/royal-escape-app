@@ -109,12 +109,16 @@ export default function RoyalEscapeHome() {
     }, [closeAuthModal, redirectAfterAuth, router]);
 
     // UPDATED: Clear persistence on sign out
-    const handleSignOut = useCallback(() => {
-        setUser(null);
-        localStorage.removeItem('royalEscapeUser');
-        console.log("User signed out.");
-        setIsProfileDropdownOpen(false);
-        setCurrentView('home'); // Go back to home view
+    const handleSignOut = useCallback(async () => {
+        try {
+            await api.auth.logout();
+            setUser(null);
+            console.log("User signed out.");
+            setIsProfileDropdownOpen(false);
+            setCurrentView('home'); // Go back to home view
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     }, []);
 
 
@@ -304,31 +308,19 @@ export default function RoyalEscapeHome() {
                                             onClick={() => setIsProfileDropdownOpen(prev => !prev)}
                                             className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400 text-sm sm:text-base"
                                         >
-                                            {user.name.charAt(0).toUpperCase()}
+                                            {user.name?.charAt(0).toUpperCase() || 'U'}
                                         </button>
 
                                         {isProfileDropdownOpen && (
                                             <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
                                                 <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-700 truncate">
-                                                    Hi, **{user.name.split(' ')[0]}**
+                                                    Hi, {user.name?.split(' ')[0] || 'User'} 
                                                 </div>
                                                 <button
-                                                    onClick={() => handleViewChange('myOrders')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <ListOrdered className="w-4 h-4 mr-2" /> My Dashboard
-                                                </button>
-                                                <button
                                                     onClick={() => handleViewChange('personalInfo')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <UserIcon className="w-4 h-4 mr-2" /> My Personal Info
-                                                </button>
-                                                <button
-                                                    onClick={() => handleViewChange('myReferrals')}
                                                     className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center border-b border-gray-700 pb-2 mb-2"
                                                 >
-                                                    <Link className="w-4 h-4 mr-2" /> My Referrals
+                                                    <UserIcon className="w-4 h-4 mr-2" /> My Personal Info
                                                 </button>
                                                 <button
                                                     onClick={handleSignOut}
@@ -352,13 +344,6 @@ export default function RoyalEscapeHome() {
                                 </>
                             )}
 
-                            {/* Mobile Menu Button */}
-                            <button
-                                className="md:hidden p-1.5 sm:p-2"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            >
-                                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
-                            </button>
                         </div>
                     </div>
                 </div>

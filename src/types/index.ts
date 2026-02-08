@@ -49,7 +49,7 @@ export interface PotItem {
 
 export interface User {
     id?: number; // Optional as it might not be present in simple UserType
-    name: string;
+    name?: string;
     email?: string;
     mobile: string;
     address?: string;

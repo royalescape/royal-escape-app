@@ -69,7 +69,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                     <Trophy className="inline w-8 h-8 mr-3 text-yellow-400" />
                     My Dashboard
                 </h2>
-                <p className="text-gray-400">Welcome back, {user.name.split(' ')[0]}! Here&apos;s your Royal Escape overview.</p>
+                <p className="text-gray-400">Welcome back, {user.name?.split(' ')[0] || 'User'}! Here&apos;s your Royal Escape overview.</p>
             </div>
 
             {/* Stats Grid */}

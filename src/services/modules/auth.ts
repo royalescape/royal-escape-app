@@ -1,63 +1,78 @@
 import { User } from "@/types";
-import { mockApiCall } from "../core";
+import { request, setAuthToken, clearAuthToken, mockApiCall } from "../core";
 
 export const authService = {
-    checkMobile: async (mobile: string): Promise<{ exists: boolean; name?: string }> => {
-        // Mock check if mobile exists
-        if (mobile === "9876543210") {
-             return mockApiCall({ exists: true, name: "Rohan Doshi" });
-        }
-        return mockApiCall({ exists: false });
+    checkMobile: async (mobile: string): Promise<{ exists: boolean; pin_required: boolean; otp_required: boolean }> => {
+        return request<{ exists: boolean; pin_required: boolean; otp_required: boolean }>('/auth/check-user', {
+            method: 'POST',
+            body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}` }),
+        });
     },
 
-    loginWithPin: async (mobile: string, pin: string): Promise<User> => {
-        // Mock login with PIN
-        if (pin === "1234") {
-             const user: User = {
-                id: 1,
-                name: "Rohan Doshi",
-                email: "rohan@example.com",
-                mobile: mobile,
-                walletBalance: 0,
-                role: 'user',
-                status: 'active'
-            };
-            return mockApiCall(user);
+    loginWithPin: async (mobile: string, pin: string): Promise<{ access_token: string }> => {
+        const response = await request<{ access_token: string }>('/auth/login-pin', {
+            method: 'POST',
+            body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}`, pin }),
+        });
+        if (response.access_token) {
+            setAuthToken(response.access_token);
         }
-        throw new Error("Invalid PIN");
+        return response;
     },
 
     sendOtp: async (mobile: string): Promise<{ success: boolean; message: string }> => {
-        // Mock send OTP
-        console.log(`Sending OTP to ${mobile}`);
-        return mockApiCall({ success: true, message: "OTP sent successfully" });
+        return request<{ success: boolean; message: string }>('/auth/otp/send', {
+            method: 'POST',
+            body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}` }),
+        });
     },
 
-    validateOtp: async (mobile: string, otp: string): Promise<{ success: boolean }> => {
-        // Mock validate OTP
-        if (otp === "1234") {
-            return mockApiCall({ success: true });
+    validateOtp: async (mobile: string, otp: string): Promise<{ registration_token?: string }> => {
+        const response = await request<{ registration_token?: string }>('/auth/otp/verify', {
+            method: 'POST',
+            body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}`, otp }),
+        });
+        const token = response.registration_token;
+        console.log('token', token);
+        if (token) {
+            setAuthToken(token);
         }
-        throw new Error("Invalid OTP");
+        return response;
+    },
+
+    me: async (): Promise<User> => {
+        return request<User>('/auth/me', {
+            method: 'GET',
+        });
+    },
+
+    setPin: async (pin: string): Promise<{ success: boolean; message: string }> => {
+        return request<{ success: boolean; message: string }>('/auth/set-pin', {
+            method: 'POST',
+            body: JSON.stringify({ pin }),
+        });
     },
 
     register: async (name: string, mobile: string, pin: string): Promise<User> => {
-            // Mock registration
-            const user: User = {
+        // Mock register response
+        const mockUser: User = {
             id: Math.floor(Math.random() * 10000),
-            name,
-            email: "", // Email is optional now, but initializing as empty string or undefined if needed
-            mobile,
+            name: name,
+            mobile: mobile.startsWith('+91') ? mobile : `+91${mobile}`,
+            email: "user@example.com",
             walletBalance: 0,
+            status: 'active',
             role: 'user',
-            status: 'active'
+            registrationDate: new Date().toISOString()
         };
-        // In a real app, you'd save the PIN here too
-        console.log(`Registered ${name} with mobile ${mobile} and PIN ${pin}`);
-        return mockApiCall(user);
+        return mockApiCall(mockUser);
     },
 
     logout: async (): Promise<void> => {
-        return mockApiCall(undefined);
+        clearAuthToken();
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('royalEscapeUser');
+        }
+        return Promise.resolve();
     }
 };

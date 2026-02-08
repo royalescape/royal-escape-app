@@ -21,7 +21,7 @@ import {
     Ticket,
     Trophy,
     Crown,
-    User,
+    User as UserIcon,
     ListOrdered,
     Link as LinkIcon,
     Lock,
@@ -29,9 +29,11 @@ import {
     X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PotItem, FAQItem } from "@/types";
+import { PotItem, FAQItem, User } from "@/types";
 import { COUPON_PRICE } from '@/lib/potData';
 import { api } from "@/services/api";
+import AuthModal from "@/components/AuthModal";
+import { useRouter } from "next/navigation";
 
 // --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
@@ -447,16 +449,18 @@ const PaymentModal = ({ onClose, potName, colors }: any) => {
 
 // Royal Escape Header Component (Matches Homepage)
 const RoyalEscapeHeader = ({
-    onProfileClick
+    user,
+    onProfileClick,
+    onAuthClick,
+    onSignOut
 }: {
+    user: User | null;
     onProfileClick?: (view: string) => void;
+    onAuthClick: (mode: 'signin' | 'signup') => void;
+    onSignOut: () => void;
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Added for mobile menu
-
-    // Mock user data - In production, this would come from your auth context/state
-    const user = { name: "Royal Escape", email: "user@example.com" };
-    const isLoggedIn = true; // Set to false to show login/register buttons
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleHomeClick = () => {
         window.location.href = '/';
@@ -471,35 +475,26 @@ const RoyalEscapeHeader = ({
         }
     };
 
-    const handleSignOut = async () => {
-        try {
-            await api.auth.logout();
-            localStorage.removeItem('royalEscapeUser');
-            window.location.href = '/';
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    };
-
-    const handleAuthClick = (mode: 'signin' | 'signup') => {
-        window.location.href = `/?auth=${mode}`;
+    const handleSignOut = () => {
+        setIsProfileDropdownOpen(false);
+        onSignOut();
     };
 
     return (
         <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    {/* Logo - Flex grow allows it to take available space */}
+                    {/* Logo */}
                     <button
                         onClick={handleHomeClick}
                         className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0 mr-4"
                     >
                         <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center p-0.5 overflow-hidden flex-shrink-0">
-                            <Image 
-                                src="/logo.png" 
-                                alt="Royal Escape Logo" 
-                                width={40} 
-                                height={40} 
+                            <Image
+                                src="/logo.png"
+                                alt="Royal Escape Logo"
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover rounded-full"
                             />
                         </div>
@@ -510,7 +505,7 @@ const RoyalEscapeHeader = ({
 
                     {/* Right Side Buttons */}
                     <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                        {isLoggedIn ? (
+                        {user ? (
                             <>
                                 {/* Profile Dropdown */}
                                 <div className="relative">
@@ -518,7 +513,7 @@ const RoyalEscapeHeader = ({
                                         onClick={() => setIsProfileDropdownOpen(prev => !prev)}
                                         className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400 text-sm sm:text-base"
                                     >
-                                        {user.name.charAt(0).toUpperCase()}
+                                        {user.name?.charAt(0).toUpperCase() || 'U'}
                                     </button>
 
                                     {isProfileDropdownOpen && (
@@ -532,25 +527,13 @@ const RoyalEscapeHeader = ({
                                             {/* Dropdown Menu */}
                                             <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
                                                 <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-700 truncate">
-                                                    Hi, <strong>{user.name.split(' ')[0]}</strong>
+                                                    Hi, <strong>{user.name?.split(' ')[0] || 'User'}</strong>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleProfileOption('myOrders')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <ListOrdered className="w-4 h-4 mr-2" /> My Dashboard
-                                                </button>
-                                                <button
                                                     onClick={() => handleProfileOption('personalInfo')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <User className="w-4 h-4 mr-2" /> My Personal Info
-                                                </button>
-                                                <button
-                                                    onClick={() => handleProfileOption('myReferrals')}
                                                     className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center border-b border-gray-700 pb-2 mb-2"
                                                 >
-                                                    <LinkIcon className="w-4 h-4 mr-2" /> My Referrals
+                                                    <UserIcon className="w-4 h-4 mr-2" /> My Personal Info
                                                 </button>
                                                 <button
                                                     onClick={handleSignOut}
@@ -567,20 +550,13 @@ const RoyalEscapeHeader = ({
                             // Login/Register Buttons (for logged out users)
                             <>
                                 <button
-                                    onClick={() => handleAuthClick('signin')}
+                                    onClick={() => onAuthClick('signin')}
                                     className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap"
                                 >
                                     LOGIN
                                 </button>
                             </>
                         )}
-                        {/* Mobile Menu Button - Added to match homepage */}
-                        <button
-                            className="md:hidden p-1.5 sm:p-2"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
-                        </button>
                     </div>
                 </div>
             </div>
@@ -608,7 +584,7 @@ const InfoModal = ({
         },
         personalInfo: {
             title: 'My Personal Info',
-            icon: User,
+            icon: UserIcon,
             color: 'purple',
             message: 'Update your profile information, contact details, and preferences.',
             note: 'Visit the main dashboard to edit your personal information.'
@@ -677,10 +653,53 @@ export default function PotClient({
     pot: PotItem;
     relatedPots: PotItem[]
 }) {
+    const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null>(null);
 
+    // Auth persistence
+    useEffect(() => {
+        try {
+            const storedUser = localStorage.getItem('royalEscapeUser');
+            if (storedUser) {
+                setUser(JSON.parse(storedUser) as User);
+            }
+        } catch (error) {
+            console.error("Failed to load user from localStorage:", error);
+            localStorage.removeItem('royalEscapeUser');
+            setUser(null);
+        }
+    }, []);
+
+    const handleAuthClick = (mode: 'signin' | 'signup') => {
+        setAuthMode(mode);
+        setIsAuthOpen(true);
+    };
+
+    const handleAuthSuccess = (authenticatedUser: User) => {
+        setUser(authenticatedUser);
+        localStorage.setItem('royalEscapeUser', JSON.stringify(authenticatedUser));
+        setIsAuthOpen(false);
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await api.auth.logout();
+            setUser(null);
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     const handlePurchase = async () => {
+        if (!user) {
+            handleAuthClick('signin');
+            return;
+        }
          // In a real implementation, you would trigger the payment API here
          // await api.payment.createSession({ potId: pot.id });
         setIsPaymentModalOpen(true);
@@ -706,9 +725,19 @@ export default function PotClient({
                 {infoModalType && <InfoModal type={infoModalType} onClose={() => setInfoModalType(null)} />}
             </AnimatePresence>
 
+            <AuthModal
+                isOpen={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                initialMode={authMode}
+                onAuthSuccess={handleAuthSuccess}
+            />
+
             {/* Royal Escape Header */}
             <RoyalEscapeHeader
+                user={user}
                 onProfileClick={handleProfileClick}
+                onAuthClick={handleAuthClick}
+                onSignOut={handleSignOut}
             />
 
             {/* Hero Section */}

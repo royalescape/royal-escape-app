@@ -9,7 +9,7 @@ interface MyReferralsProps {
 }
 
 const MyReferrals: React.FC<MyReferralsProps> = ({ user }) => {
-    const referralLink = `https://royalescape.club/join?ref=${user.name.replace(/\s/g, '-')}`;
+    const referralLink = `https://royalescape.club/join?ref=${user.name?.replace(/\s/g, '-') || 'User'}`;
     const [copyText, setCopyText] = useState('Copy Link');
 
     // Mock data for referrals

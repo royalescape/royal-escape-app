@@ -39,7 +39,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
             <div className="max-w-7xl mx-auto relative z-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
                     <Crown className="inline w-10 h-10 mr-3 text-yellow-400" />
-                    Welcome back, <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{user.name.split(' ')[0]}!</span>
+                    Welcome back, <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{user.name?.split(' ')[0] || 'User'}!</span>
                 </h1>
                 <p className="text-xl text-gray-400 max-w-4xl mb-8">
                     Your Royal Escape overview at a glance. Get ready for the next draw.
