@@ -35,13 +35,10 @@ export interface PotItem {
     createdDate?: string; // Added from Admin Pot
     drawDate?: string; // Added from Admin Pot
     winner?: string; // Added from Admin Pot
-    merchandiseId?: number; // Added from Admin Pot
-    totalEntries?: number; // Added to support Admin view statistics
-    
+    totalEntries?: number; // Added to support Admin view statistics    
     // Detailed fields (optional for list views if needed, but required for detail views)
     prizeDetails?: string[];
     gallery?: string[];
-    merchList?: MerchItem[];
     faqs?: FAQItem[];
     termsAndConditions?: string[];
     color?: string;

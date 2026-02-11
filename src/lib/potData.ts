@@ -33,15 +33,6 @@ export const potData: PotItem[] = [
             "/images/macbook_air_m3_2.png",
             "/images/macbook_air_m3_3.png",
         ],
-        merchList: [
-            {
-                id: 1,
-                name: "Royal Key Chain",
-                price: 249,
-                image: "/images/key_chain.png",
-                costAfterCoupon: 0,
-            },
-        ],
         faqs: [
             {
                 question: "How many entries can I purchase?",
@@ -88,15 +79,6 @@ export const potData: PotItem[] = [
             "/images/apple_watch_ultra_2_2.png",
             "/images/apple_watch_ultra_2_3.png",
         ],
-        merchList: [
-            {
-                id: 1,
-                name: "Adventure Mug",
-                price: 299,
-                image: "/images/adventure_mug.png",
-                costAfterCoupon: 0,
-            },
-        ],
         faqs: [
             {
                 question: "Is this the latest model?",
@@ -142,15 +124,7 @@ export const potData: PotItem[] = [
             "/images/gold_coin_2.png",
             "/images/gold_coin_3.png",
         ],
-        merchList: [
-            {
-                id: 1,
-                name: "Royal Pouch",
-                price: 199,
-                image: "/images/royal_pouch.png",
-                costAfterCoupon: 0,
-            },
-        ],
+        
         faqs: [
             {
                 question: "Is the gold coin hallmarked?",
@@ -195,15 +169,7 @@ export const potData: PotItem[] = [
             "/images/luxury_staycation_2.png",
             "/images/luxury_staycation_3.png",
         ],
-        merchList: [
-            {
-                id: 1,
-                name: "Travel Kit",
-                price: 399,
-                image: "/images/travel_kit.png",
-                costAfterCoupon: 0,
-            },
-        ],
+        
         faqs: [
             {
                 question: "Which locations are available?",
@@ -249,15 +215,7 @@ export const potData: PotItem[] = [
             "/images/maldives_escape_2.png",
             "/images/maldives_escape_3.png",
         ],
-        merchList: [
-            {
-                id: 1,
-                name: "Beach Tote Bag",
-                price: 299,
-                image: "/images/beach_tote.png",
-                costAfterCoupon: 0,
-            },
-        ],
+        
         faqs: [
             {
                 question: "Are flights included?",
@@ -295,7 +253,6 @@ export const potData: PotItem[] = [
         status: "Upcoming",
         prizeDetails: [],
         gallery: [],
-        merchList: [],
         faqs: [],
         termsAndConditions: [],
         color: "#6366F1"
@@ -316,7 +273,6 @@ export const potData: PotItem[] = [
         status: "Upcoming",
         prizeDetails: [],
         gallery: [],
-        merchList: [],
         faqs: [],
         termsAndConditions: [],
         color: "#F97316"
@@ -337,7 +293,6 @@ export const potData: PotItem[] = [
         status: "Upcoming",
         prizeDetails: [],
         gallery: [],
-        merchList: [],
         faqs: [],
         termsAndConditions: [],
         color: "#4ADE80"

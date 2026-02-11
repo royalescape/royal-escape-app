@@ -35,7 +35,6 @@ const MOCK_POTS: PotItem[] = [
         drawDate: '2025-01-05',
         createdDate: '2024-12-15',
         revenue: 236550,
-        merchandiseId: 1,
         // Default required fields for PotItem
         category: 'macbook',
         type: 'Electronics',
@@ -58,7 +57,6 @@ const MOCK_POTS: PotItem[] = [
         drawDate: '2025-01-01',
         createdDate: '2024-12-10',
         revenue: 186750,
-        merchandiseId: 2,
         category: 'gold',
         type: 'Financial',
         filled: 750,
@@ -80,7 +78,6 @@ const MOCK_POTS: PotItem[] = [
         drawDate: '2025-01-20',
         createdDate: '2024-12-25',
         revenue: 0,
-        merchandiseId: 3,
         category: 'macbook', // Default fallback
         type: 'Electronics',
         filled: 0,
@@ -190,7 +187,6 @@ const PotFormModal: React.FC<{
         entryFee: pot?.entryFee || 249,
         maxEntries: pot?.maxEntries || 1000,
         drawDate: pot?.drawDate || '',
-        merchandiseId: pot?.merchandiseId || 1, // Added field
     });
 
     const handleSubmit = () => {
@@ -299,17 +295,6 @@ const PotFormModal: React.FC<{
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
-                        </div>
-                        {/* New Field: Merchandise Link */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Merchandise ID</label>
-                            <input
-                                type="number"
-                                value={formData.merchandiseId}
-                                onChange={e => setFormData({ ...formData, merchandiseId: Number(e.target.value) })}
-                                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-yellow-500"
-                                placeholder="e.g., 1"
-                            />
                         </div>
                     </div>
 
