@@ -10,22 +10,26 @@ const mapPot = (pot: any): PotItem => ({
 
 export const potService = {
     getAll: async (): Promise<PotItem[]> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pots = await request<any[]>('/pots/all');
         return pots.map(mapPot);
     },
     
     getActive: async (): Promise<PotItem[]> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pots = await request<any[]>('/pots?status=active');
         return pots.map(mapPot);
     },
 
     getUpcoming: async (): Promise<PotItem[]> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pots = await request<any[]>('/pots/status=upcoming');
         return pots.map(mapPot);
     },
 
     getById: async (id: string): Promise<PotItem | undefined> => {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const pot = await request<any>(`/pots/${id}`);
             return mapPot(pot);
         } catch (error: any) {
@@ -36,6 +40,7 @@ export const potService = {
     },
 
     getByType: async (type: PotItem["type"]): Promise<PotItem[]> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pots = await request<any[]>(`/pots`, { params: { type } });
         return pots.map(mapPot);
     },
