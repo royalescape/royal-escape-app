@@ -1,5 +1,5 @@
 import { User } from "@/types";
-import { request, setAuthToken, clearAuthToken, mockApiCall } from "../core";
+import { request, setAuthToken, clearAuthToken } from "../core";
 
 export const authService = {
     checkMobile: async (mobile: string): Promise<{ exists: boolean; pin_required: boolean; otp_required: boolean }> => {

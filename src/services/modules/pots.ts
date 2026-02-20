@@ -32,7 +32,8 @@ export const potService = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const pot = await request<any>(`/pots/${id}`);
             return mapPot(pot);
-        } catch (error: any) {
+        } // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        catch (error: any) {
             // Return undefined if not found, to match previous behavior
             if (error.statusCode === 404) return undefined;
             throw error;
