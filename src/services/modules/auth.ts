@@ -53,19 +53,15 @@ export const authService = {
         });
     },
 
-    register: async (name: string, mobile: string, pin: string): Promise<User> => {
-        // Mock register response
-        const mockUser: User = {
-            id: Math.floor(Math.random() * 10000),
-            name: name,
-            mobile: mobile.startsWith('+91') ? mobile : `+91${mobile}`,
-            email: "user@example.com",
-            walletBalance: 0,
-            status: 'active',
-            role: 'user',
-            registrationDate: new Date().toISOString()
-        };
-        return mockApiCall(mockUser);
+    register: async (name: string, email: string, pin: string): Promise<User> => {
+        return request<User>('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                name,
+                email,
+                pincode: pin
+            }),
+        });
     },
 
     logout: async (): Promise<void> => {

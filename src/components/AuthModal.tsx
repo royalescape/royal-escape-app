@@ -147,7 +147,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         }
     };
 
-    const handleNameSubmit = async (e: React.FormEvent) => {
+    const handleProfileSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
@@ -155,8 +155,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         try {
             if (!name) throw new Error("Please enter your name.");
 
-            // Register new user
-            const user = await authService.register(name, mobile, pin);
+            // Register new user (sending empty email to reduce friction)
+            const user = await authService.register(name, "", pin);
             handleSuccess(user);
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -282,7 +282,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                     )}
 
                     {step === 4 && (
-                        <form onSubmit={handleNameSubmit}>
+                        <form onSubmit={handleProfileSubmit}>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
                                 <div className="relative">
