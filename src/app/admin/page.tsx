@@ -21,7 +21,7 @@ const MOCK_ADMIN = { email: 'admin@royalescape.club', role: 'admin' as const };
 // Mapping to match PotItem from @/types but with required fields for Admin view
 const MOCK_POTS: PotItem[] = [
     {
-        id: 1,
+        id: '1',
         name: "MacBook Air M3",
         icon: "💻",
         prizeValue: "₹1,20,000",
@@ -45,7 +45,7 @@ const MOCK_POTS: PotItem[] = [
         endDate: '2025-01-05'
     },
     {
-        id: 2,
+        id: '2',
         name: "Gold Coin",
         icon: "🪙",
         prizeValue: "₹30,000-₹40,000",
@@ -66,7 +66,7 @@ const MOCK_POTS: PotItem[] = [
         endDate: '2025-01-01'
     },
     {
-        id: 6,
+        id: '6',
         name: "iPhone 16 Pro",
         icon: "📱",
         prizeValue: "₹1,60,000",
@@ -90,33 +90,33 @@ const MOCK_POTS: PotItem[] = [
 
 const MOCK_USERS: User[] = [
     {
-        id: 101, name: "Arjun Singh", email: "arjun@example.com", mobile: "9876543210", address: "Mumbai",
-        walletBalance: 1500, status: 'active', registrationDate: '2024-12-15', totalEntries: 15, totalWinnings: 5000, referralCode: 'ARJUN101'
+        id: '101', name: "Arjun Singh", email: "arjun@example.com", mobile: "9876543210", address: "Mumbai",
+        walletBalance: 1500, status: 'active', registrationDate: '2024-12-15', totalEntries: 15, totalWinnings: 5000
     },
     {
-        id: 102, name: "Priya Sharma", email: "priya@example.com", mobile: "9988776655", address: "Delhi",
-        walletBalance: 250, status: 'active', registrationDate: '2024-12-18', totalEntries: 5, totalWinnings: 0, referralCode: 'PRIYA102'
+        id: '102', name: "Priya Sharma", email: "priya@example.com", mobile: "9988776655", address: "Delhi",
+        walletBalance: 250, status: 'active', registrationDate: '2024-12-18', totalEntries: 5, totalWinnings: 0
     },
     {
-        id: 103, name: "Ravi Varma", email: "ravi@example.com", mobile: "9000011111", address: "Bangalore",
-        walletBalance: 0, status: 'suspended', registrationDate: '2024-12-20', totalEntries: 0, totalWinnings: 0, referralCode: 'RAVI103'
+        id: '103', name: "Ravi Varma", email: "ravi@example.com", mobile: "9000011111", address: "Bangalore",
+        walletBalance: 0, status: 'suspended', registrationDate: '2024-12-20', totalEntries: 0, totalWinnings: 0
     },
 ];
 
 const MOCK_COUPONS: Coupon[] = [
-    { id: 1, code: 'WELCOME20', discountType: 'percentage', value: 20, expiryDate: '2025-02-28', usageLimit: 1000, usedCount: 50, appliesTo: 'global' },
-    { id: 2, code: 'POT1FREE', discountType: 'fixed', value: 249, expiryDate: '2025-01-05', usageLimit: 10, usedCount: 3, appliesTo: 'specific_pot', targetId: 1 },
+    { id: '1', code: 'WELCOME20', discountType: 'percentage', value: 20, expiryDate: '2025-02-28', usageLimit: 1000, usedCount: 50, appliesTo: 'global' },
+    { id: '2', code: 'POT1FREE', discountType: 'fixed', value: 249, expiryDate: '2025-01-05', usageLimit: 10, usedCount: 3, appliesTo: 'specific_pot', targetId: '1' },
 ];
 
 const MOCK_TRANSACTIONS: Transaction[] = [
-    { id: 1, userId: 101, type: 'deposit', amount: 2000, date: '2024-12-28', status: 'success' },
-    { id: 2, userId: 101, type: 'spend', amount: 747, date: '2024-12-29', status: 'success', potId: 1 },
-    { id: 3, userId: 102, type: 'win', amount: 5000, date: '2025-01-02', status: 'success' },
+    { id: '1', userId: '101', type: 'deposit', amount: 2000, date: '2024-12-28', status: 'success' },
+    { id: '2', userId: '101', type: 'spend', amount: 747, date: '2024-12-29', status: 'success', potId: '1' },
+    { id: '3', userId: '102', type: 'win', amount: 5000, date: '2025-01-02', status: 'success' },
 ];
 
 const MOCK_TICKETS: SupportTicket[] = [
-    { id: 1, userId: 102, subject: 'Wallet Deposit Issue', status: 'open', priority: 'high', lastUpdated: '2025-01-03 10:00' },
-    { id: 2, userId: 101, subject: 'Pot 2 Draw Inquiry', status: 'in-progress', priority: 'medium', lastUpdated: '2025-01-03 15:30' },
+    { id: '1', userId: '102', subject: 'Wallet Deposit Issue', status: 'open', priority: 'high', lastUpdated: '2025-01-03 10:00' },
+    { id: '2', userId: '101', subject: 'Pot 2 Draw Inquiry', status: 'in-progress', priority: 'medium', lastUpdated: '2025-01-03 15:30' },
 ];
 
 
@@ -333,7 +333,7 @@ const PotFormModal: React.FC<{
 const PotsTable: React.FC<{
     pots: PotItem[];
     onEdit: (pot: PotItem) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
     onView: (pot: PotItem) => void;
 }> = ({ pots, onEdit, onDelete, onView }) => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -608,7 +608,7 @@ const CouponManagement: React.FC<{ coupons: Coupon[], onCreate: () => void }> = 
         <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-bold text-white flex items-center">
                 <Tag className="w-6 h-6 mr-2 text-yellow-400" />
-                Coupon & Referral Management
+                Coupon Management
             </h3>
             <button
                 onClick={onCreate}
@@ -651,19 +651,13 @@ const CouponManagement: React.FC<{ coupons: Coupon[], onCreate: () => void }> = 
                 </tbody>
             </table>
         </div>
-        {/* Placeholder for Referral Audit */}
-        <h4 className="text-xl font-semibold text-white mb-4 mt-8">Referral Program Audit</h4>
-        <div className="p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-400">
-            <p className="flex items-center"><TrendingUp className="w-4 h-4 mr-2" /> Total Referrals Tracked: **15** (Placeholder)</p>
-            <p className="flex items-center"><DollarSign className="w-4 h-4 mr-2" /> Total Referral Value Distributed: **₹15,000** (Placeholder)</p>
-        </div>
     </div>
 );
 
 
 // 4. Support Ticket Component
 const SupportManagement: React.FC<{ tickets: SupportTicket[], users: User[] }> = ({ tickets, users }) => {
-    const getUserName = (userId: number) => users.find(u => u.id === userId)?.name || `User ${userId}`;
+    const getUserName = (userId: string) => users.find(u => u.id === userId)?.name || `User ${userId}`;
     return (
         <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white flex items-center mb-6">
@@ -718,7 +712,7 @@ const Sidebar: React.FC<{
         { view: 'pots', icon: Trophy, label: 'Pots Management' },
         { view: 'users', icon: Users, label: 'User Management' },
         { view: 'finance', icon: Wallet, label: 'Financials' },
-        { view: 'coupons', icon: Tag, label: 'Coupons/Referrals' },
+        { view: 'coupons', icon: Tag, label: 'Coupons' },
         { view: 'support', icon: MessageSquare, label: 'Support Tickets' },
     ];
 
@@ -779,7 +773,7 @@ export default function AdminDashboard() {
             const { id, ...safePotData } = potData;
 
             const newPot: PotItem = {
-                id: pots.length > 0 ? Math.max(...pots.map(p => p.id)) + 1 : 1,
+                id: String(pots.length > 0 ? Math.max(...pots.map(p => parseInt(p.id))) + 1 : 1),
                 totalEntries: 0,
                 revenue: 0,
                 createdDate: new Date().toISOString().split('T')[0],
@@ -799,7 +793,7 @@ export default function AdminDashboard() {
         setEditingPot(undefined);
     };
 
-    const handleDeletePot = (id: number) => {
+    const handleDeletePot = (id: string) => {
         if (confirm('Are you sure you want to delete this pot?')) {
             setPots(pots.filter(p => p.id !== id));
         }
@@ -811,7 +805,7 @@ export default function AdminDashboard() {
 
     // User Handlers
     const handleViewUser = (user: User) => {
-        alert(`Viewing User Profile for: ${user.name} (ID: ${user.id})\n\nWallet Balance: ₹${user.walletBalance}\nReferral Code: ${user.referralCode}\nStatus: ${user.status?.toUpperCase()}`);
+        alert(`Viewing User Profile for: ${user.name} (ID: ${user.id})\n\nWallet Balance: ₹${user.walletBalance}\nStatus: ${user.status?.toUpperCase()}`);
     };
 
     // Coupon Handlers

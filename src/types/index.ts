@@ -4,7 +4,7 @@ export interface FAQItem {
 }
 
 export interface MerchItem {
-    id: number;
+    id: string;
     name: string;
     price: number;
     image: string;
@@ -16,7 +16,7 @@ export type PotType = "Electronics" | "Travel" | "Financial";
 export type PotStatus = 'active' | 'upcoming' | 'completed' | 'cancelled' | 'ending-soon';
 
 export interface PotItem {
-    id: number;
+    id: string;
     category: PotCategory;
     type: PotType;
     name: string;
@@ -45,7 +45,7 @@ export interface PotItem {
 }
 
 export interface User {
-    id?: number; // Optional as it might not be present in simple UserType
+    id?: string; // Optional as it might not be present in simple UserType
     name?: string;
     email?: string;
     mobile: string;
@@ -55,14 +55,13 @@ export interface User {
     registrationDate?: string;
     totalEntries?: number;
     totalWinnings?: number;
-    referralCode?: string;
     role?: 'user' | 'admin' | 'super-admin';
 }
 
-export type View = 'home' | 'personalInfo' | 'myOrders' | 'myReferrals';
+export type View = 'home' | 'personalInfo' | 'myOrders';
 
 export interface Coupon {
-    id: number;
+    id: string;
     code: string;
     discountType: 'percentage' | 'fixed';
     value: number;
@@ -70,23 +69,23 @@ export interface Coupon {
     usageLimit: number;
     usedCount: number;
     appliesTo: 'global' | 'specific_pot' | 'specific_user';
-    targetId?: number;
+    targetId?: string;
 }
 
 export interface Transaction {
-    id: number;
-    userId: number;
+    id: string;
+    userId: string;
     type: 'deposit' | 'spend' | 'win' | 'refund' | 'coupon';
     amount: number;
     date: string;
     status: 'success' | 'failed';
-    potId?: number;
+    potId?: string;
     description?: string; // Added from MyDashboard
 }
 
 export interface SupportTicket {
-    id: number;
-    userId: number;
+    id: string;
+    userId: string;
     subject: string;
     status: 'open' | 'in-progress' | 'closed';
     priority: 'low' | 'medium' | 'high';

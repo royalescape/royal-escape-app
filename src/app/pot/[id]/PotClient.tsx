@@ -23,7 +23,6 @@ import {
     Crown,
     User as UserIcon,
     ListOrdered,
-    Link as LinkIcon,
     Lock,
     Menu,
     X
@@ -96,7 +95,7 @@ const SameCategoryToggles = ({
     type,
     category
 }: {
-    currentPotId: number;
+    currentPotId: string;
     pots: PotItem[];
     type: PotItem["type"];
     category: string;
@@ -569,7 +568,7 @@ const InfoModal = ({
     type,
     onClose
 }: {
-    type: 'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null;
+    type: 'wallet' | 'dashboard' | 'personalInfo' | null;
     onClose: () => void;
 }) => {
     if (!type || type === 'wallet') return null;
@@ -588,13 +587,6 @@ const InfoModal = ({
             color: 'purple',
             message: 'Update your profile information, contact details, and preferences.',
             note: 'Visit the main dashboard to edit your personal information.'
-        },
-        referrals: {
-            title: 'My Referrals',
-            icon: LinkIcon,
-            color: 'yellow',
-            message: 'Share your referral link and earn rewards when friends join Royal Escape.',
-            note: 'Visit the main dashboard to view your referral statistics and earnings.'
         }
     };
     
@@ -658,7 +650,7 @@ export default function PotClient({
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-    const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | 'referrals' | null>(null);
+    const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | null>(null);
 
     // Auth persistence
     useEffect(() => {
@@ -706,10 +698,9 @@ export default function PotClient({
     };
 
     const handleProfileClick = (view: string) => {
-        const modalMap: Record<string, 'dashboard' | 'personalInfo' | 'referrals'> = {
+        const modalMap: Record<string, 'dashboard' | 'personalInfo'> = {
             'myOrders': 'dashboard',
             'personalInfo': 'personalInfo',
-            'myReferrals': 'referrals'
         };
         setInfoModalType(modalMap[view]);
     };

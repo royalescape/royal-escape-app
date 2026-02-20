@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
     Sparkles, Trophy, Instagram, Facebook, MessageCircle, Menu, X,
-    User as UserIcon, ListOrdered, Link, Lock, Gift, Crown
+    User as UserIcon, ListOrdered, Link, Lock, Gift, Crown, Package
 } from 'lucide-react';
 
 import FAQSection from "@/components/FAQSection";
 import AuthModal from "@/components/AuthModal";
-import MyReferrals from "@/components/MyReferrals";
 import MyPersonalInfo from "@/components/MyPersonalInfo";
 import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
@@ -123,7 +122,7 @@ export default function RoyalEscapeHome() {
 
 
     // FUNCTION: Handles click on a Pot, checks authentication, and redirects
-    const handlePotClick = (potId: number) => {
+    const handlePotClick = (potId: string) => {
         const potUrl = `/pot/${potId}`;
 
         if (user) {
@@ -142,8 +141,6 @@ export default function RoyalEscapeHome() {
         switch (currentView) {
             case 'personalInfo':
                 return <MyPersonalInfo user={user} />;
-            case 'myReferrals':
-                return <MyReferrals user={user} />;
             case 'myOrders':
                 return <MyDashboard user={user} />;
             case 'home':
@@ -154,7 +151,7 @@ export default function RoyalEscapeHome() {
     };
 
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: any[], comingSoonPots: any[], handlePotClick: (id: number) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
+    const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: any[], comingSoonPots: any[], handlePotClick: (id: string) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
         <>
             {/* Hero Banner / Dashboard Summary (CONDITIONALLY RENDERED) */}
             {user ? (
@@ -231,22 +228,35 @@ export default function RoyalEscapeHome() {
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
                         Live <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Pots</span>
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {livePots.map(pot => (
-                            <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300 flex flex-col h-full">
-                                <div className="text-6xl mb-4">{pot.icon}</div>
-                                <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
-                                <p className="text-gray-400 mb-3 flex-grow">{pot.description}</p>
-                                <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
-                                <button
-                                    onClick={() => handlePotClick(pot.id)}
-                                    className="mt-4 w-full py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/40 transition-all"
-                                >
-                                    Know More
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+                    
+                    {livePots.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {livePots.map(pot => (
+                                <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300 flex flex-col h-full">
+                                    <div className="text-6xl mb-4">{pot.icon}</div>
+                                    <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
+                                    <p className="text-gray-400 mb-3 flex-grow">{pot.description}</p>
+                                    <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
+                                    <button
+                                        onClick={() => handlePotClick(pot.id)}
+                                        className="mt-4 w-full py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:shadow-lg hover:shadow-yellow-400/40 transition-all"
+                                    >
+                                        Know More
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 bg-gray-800/30 rounded-2xl border border-gray-700/50 border-dashed">
+                            <Package className="w-16 h-16 text-gray-600 mb-4" />
+                            <h3 className="text-xl font-semibold text-white mb-2">No Live Pots Currently</h3>
+                            <p className="text-gray-400 max-w-md">
+                                We are preparing the next batch of luxury giveaways.
+                                <br />
+                                Check back soon or join our waitlist!
+                            </p>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -257,16 +267,29 @@ export default function RoyalEscapeHome() {
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
                         Coming <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Soon</span>
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {comingSoonPots.map(pot => (
-                            <div key={pot.id} className="bg-gray-800/70 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
-                                <div className="text-6xl mb-4">{pot.icon}</div>
-                                <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
-                                <p className="text-gray-400 mb-3">{pot.description}</p>
-                                <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
-                            </div>
-                        ))}
-                    </div>
+                    
+                    {comingSoonPots.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {comingSoonPots.map(pot => (
+                                <div key={pot.id} className="bg-gray-800/70 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
+                                    <div className="text-6xl mb-4">{pot.icon}</div>
+                                    <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
+                                    <p className="text-gray-400 mb-3">{pot.description}</p>
+                                    <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 bg-gray-800/30 rounded-2xl border border-gray-700/50 border-dashed">
+                            <Sparkles className="w-16 h-16 text-gray-600 mb-4" />
+                            <h3 className="text-xl font-semibold text-white mb-2">More Treasures Coming Soon</h3>
+                            <p className="text-gray-400 max-w-md">
+                                Our team is curating exclusive new experiences and prizes.
+                                <br />
+                                Stay tuned for updates!
+                            </p>
+                        </div>
+                    )}
                 </div>
             </section>
         </>

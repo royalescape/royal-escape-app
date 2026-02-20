@@ -12,14 +12,14 @@ export async function generateStaticParams() {
     const pots = await api.pots.getAll();
     return pots.map((pot) => ({
         // IDs must be returned as strings
-        id: String(pot.id),
+        id: pot.id,
     }));
 }
 
 // 2. Main Server Component
 export default async function PotPage({ params }: { params: { id: string } }) {
     // 1. Fetch current pot data
-    const pot = await api.pots.getById(Number(params.id));
+    const pot = await api.pots.getById(params.id);
 
     if (!pot) {
         notFound();

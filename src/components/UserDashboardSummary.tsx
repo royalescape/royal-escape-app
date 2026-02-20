@@ -15,7 +15,6 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
     const [stats, setStats] = useState({
         activeEntries: 0,
         walletBalance: 0,
-        referralEarnings: 0,
         totalTickets: 0
     });
     
@@ -46,7 +45,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                 </p>
 
                 {/* Summary Stats Grid - Added onClick and styling to each stat block */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
                     <div
                         onClick={() => handleViewChange('myOrders')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
@@ -54,14 +53,6 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                         <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-2" />
                         <p className="text-3xl font-bold text-blue-400">{stats.activeEntries}</p>
                         <p className="text-xs text-gray-400">Active Entries</p>
-                    </div>
-                    <div
-                        onClick={() => handleViewChange('myReferrals')}
-                        className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
-                    >
-                        <Gift className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                        <p className="text-3xl font-bold text-purple-400">₹{stats.referralEarnings}</p>
-                        <p className="text-xs text-gray-400">Referral Earnings</p>
                     </div>
                     <div
                         onClick={() => handleViewChange('myOrders')}

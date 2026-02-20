@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Trophy, Sparkles, Gift } from 'lucide-react';
+import { Trophy, Sparkles } from 'lucide-react';
 import { User, Transaction } from '@/types';
 import { api } from '@/services/api';
 
@@ -16,7 +16,6 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
         totalSpent: 0,
         totalWinnings: 0,
         walletBalance: 0,
-        referralEarnings: 0,
         totalTickets: 0
     });
     const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
@@ -73,7 +72,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-2">
                         <Trophy className="w-8 h-8 text-blue-400" />
@@ -81,15 +80,6 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                     </div>
                     <p className="text-sm text-gray-300 font-medium">Active Entries</p>
                     <p className="text-xs text-gray-500 mt-1">Currently in the draw</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <Gift className="w-8 h-8 text-purple-400" />
-                        <span className="text-2xl font-bold text-purple-400">₹{stats.referralEarnings}</span>
-                    </div>
-                    <p className="text-sm text-gray-300 font-medium">Referral Earnings</p>
-                    <p className="text-xs text-gray-500 mt-1">From friend signups</p>
                 </div>
 
                 <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border border-orange-500/30 rounded-xl p-6">
@@ -132,16 +122,12 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         </div>
                         Total Earnings
                     </h3>
-                    <p className="text-4xl font-bold text-green-400 mb-2">₹{stats.totalWinnings + stats.referralEarnings}</p>
-                    <p className="text-sm text-gray-400">Winnings & referral bonuses</p>
+                    <p className="text-4xl font-bold text-green-400 mb-2">₹{stats.totalWinnings}</p>
+                    <p className="text-sm text-gray-400">Prize winnings</p>
                     <div className="mt-4 pt-4 border-t border-gray-700">
                         <div className="flex justify-between text-sm mb-2">
                             <span className="text-gray-400">Prize Winnings</span>
                             <span className="text-white font-semibold">₹{stats.totalWinnings}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">Referral Bonuses</span>
-                            <span className="text-white font-semibold">₹{stats.referralEarnings}</span>
                         </div>
                     </div>
                 </div>
