@@ -12,9 +12,24 @@ export interface MerchItem {
 }
 
 export type PotCategory = "gold" | "luxury" | "maldives" | "macbook" | "watch";
-export type PotType = "Electronics" | "Travel" | "Financial";
+export type PotType = "electronics" | "travel" | "financial" | "default";
 export type PotStatus = 'active' | 'upcoming' | 'completed' | 'cancelled' | 'ending-soon';
 
+export interface PotInfoResponse {
+    id: string;
+    description: string;
+    name: string;
+    prize_amount: number;
+    type: string;
+}
+
+export interface PotInfo {
+    id: string;
+    description: string;
+    name: string;
+    prizeValue: string;
+    type: PotType;
+}
 export interface PotItem {
     id: string;
     category: PotCategory;

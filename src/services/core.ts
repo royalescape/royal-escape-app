@@ -60,6 +60,7 @@ export const request = async <T>(endpoint: string, options: RequestOptions = {})
     const response = await fetch(url, {
         ...init,
         headers,
+        redirect: 'follow', // Explicitly follow redirects
     });
 
     if (!response.ok) {

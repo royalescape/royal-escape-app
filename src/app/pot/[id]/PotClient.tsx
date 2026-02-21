@@ -25,31 +25,38 @@ import {
     ListOrdered,
     Lock,
     Menu,
-    X
+    X,
+    ArrowRight,
+    QrCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PotItem, FAQItem, User } from "@/types";
+import { PotItem, FAQItem, User, PotInfo, PotType } from "@/types";
 import { COUPON_PRICE } from '@/lib/potData';
 import { api } from "@/services/api";
 import AuthModal from "@/components/AuthModal";
+import PaymentModal from "@/components/PaymentModal"; // Import the new PaymentModal
 import { useRouter } from "next/navigation";
 
 // --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
-const IconMap: Record<string, React.ElementType> = {
-    gold: Coins,
-    luxury: Hotel,
-    maldives: Plane,
-    macbook: Laptop,
-    watch: Watch,
+const IconMap: Record<PotType, React.ElementType> = {
+    financial: Coins,
+    travel: Plane,
+    electronics: Laptop,
     default: Sparkles,
+};
+
+const colorsArray: string[] = ["#6366F1", "#4ADE80", "#FFD700", "#F97316", "#22D3EE"]
+
+const getRandomColor = () => {
+    return colorsArray[Math.floor(Math.random() * colorsArray.length)];
 };
 
 // Color configurations based on category
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-const getColorClasses = (category: string) => {
+const getColorClasses = (type: PotType) => {
     const configs: Record<string, any> = {
-        macbook: {
+        electronics: {
             gradient: "from-indigo-600/20 via-purple-600/20 to-blue-600/20",
             border: "border-indigo-500/30",
             text: "text-indigo-300",
@@ -63,21 +70,21 @@ const getColorClasses = (category: string) => {
             button: "from-emerald-500 to-green-600",
             glow: "shadow-emerald-500/20"
         },
-        gold: {
+        financial: {
             gradient: "from-yellow-600/20 via-amber-600/20 to-orange-600/20",
             border: "border-yellow-500/30",
             text: "text-yellow-300",
             button: "from-yellow-500 to-amber-600",
             glow: "shadow-yellow-500/20"
         },
-        luxury: {
+        default: {
             gradient: "from-orange-600/20 via-red-600/20 to-pink-600/20",
             border: "border-orange-500/30",
             text: "text-orange-300",
             button: "from-orange-500 to-red-600",
             glow: "shadow-orange-500/20"
         },
-        maldives: {
+        travel: {
             gradient: "from-cyan-600/20 via-blue-600/20 to-indigo-600/20",
             border: "border-cyan-500/30",
             text: "text-cyan-300",
@@ -85,7 +92,7 @@ const getColorClasses = (category: string) => {
             glow: "shadow-cyan-500/20"
         }
     };
-    return configs[category] || configs.macbook;
+    return configs[type] || configs.default;
 };
 
 // Fixed Category Toggles Component
@@ -93,14 +100,12 @@ const SameCategoryToggles = ({
     currentPotId,
     pots,
     type,
-    category
 }: {
     currentPotId: string;
-    pots: PotItem[];
+    pots: PotInfo[];
     type: PotItem["type"];
-    category: string;
 }) => {
-    const colors = getColorClasses(category);
+    const colors = getColorClasses(type);
 
     if (pots.length <= 1) return null;
 
@@ -113,8 +118,8 @@ const SameCategoryToggles = ({
             <div className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar">
                 {pots.map((pot) => {
                     const isActive = pot.id === currentPotId;
-                    const PotIcon = IconMap[pot.category] || IconMap.default;
-                    const potColors = getColorClasses(pot.category);
+                    const PotIcon = IconMap[pot.type] || IconMap.default;
+                    const potColors = getColorClasses(pot.type);
 
                     return (
                         <Link key={pot.id} href={`/pot/${pot.id}`}>
@@ -143,7 +148,7 @@ const SameCategoryToggles = ({
                                         layoutId="activeIndicator"
                                         className={`absolute -inset-[2px] rounded-xl pointer-events-none ${potColors.border}`}
                                         style={{
-                                            boxShadow: `0 0 20px ${pot.color}40`
+                                            boxShadow: `0 0 20px ${getRandomColor()}40`
                                         }}
                                     />
                                 )}
@@ -261,9 +266,9 @@ const Confetti = () => {
     );
 };
 
-// Payment Modal Component
+// Processing Payment Modal Component (renamed from PaymentModal to avoid conflict)
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-const PaymentModal = ({ onClose, potName, colors }: any) => {
+const ProcessingPaymentModal = ({ onClose, potName, colors }: any) => {
     const [step, setStep] = useState<"payment" | "success">("payment");
     const [countdown, setCountdown] = useState(5);
 
@@ -643,13 +648,14 @@ export default function PotClient({
     relatedPots
 }: {
     pot: PotItem;
-    relatedPots: PotItem[]
+    relatedPots: PotInfo[];
 }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // For the new PaymentModal
+    const [isProcessingPaymentModalOpen, setIsProcessingPaymentModalOpen] = useState(false); // For the existing processing modal
     const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | null>(null);
 
     // Auth persistence
@@ -692,9 +698,15 @@ export default function PotClient({
             handleAuthClick('signin');
             return;
         }
-         // In a real implementation, you would trigger the payment API here
-         // await api.payment.createSession({ potId: pot.id });
-        setIsPaymentModalOpen(true);
+        setIsPaymentModalOpen(true); // Open the new PaymentModal
+    };
+
+    const handlePaymentSubmission = async (upiId: string) => {
+        console.log("UPI Transaction ID submitted:", upiId);
+        // Here you would typically make an API call to verify the UPI transaction
+        // For now, simulate success and then open the processing payment modal
+        setIsPaymentModalOpen(false); // Close the new PaymentModal
+        setIsProcessingPaymentModalOpen(true); // Open the processing payment modal
     };
 
     const handleProfileClick = (view: string) => {
@@ -706,12 +718,24 @@ export default function PotClient({
     };
 
     const filledPercent = ((pot.filled / pot.totalSlots) * 100).toFixed(1);
-    const PotIcon = IconMap[pot.category] || IconMap.default;
-    const colors = getColorClasses(pot.category);
+    const PotIcon = IconMap[pot.type] || IconMap.default;
+    const colors = getColorClasses(pot.type);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
-            {isPaymentModalOpen && <PaymentModal onClose={() => setIsPaymentModalOpen(false)} potName={pot.name} colors={colors} />}
+            {/* New Payment Modal */}
+            {isPaymentModalOpen && (
+                <PaymentModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={() => setIsPaymentModalOpen(false)}
+                    onPaymentSubmit={handlePaymentSubmission}
+                    qrCodeSrc="/logo.png" // Using logo.png as placeholder for QR code
+                />
+            )}
+
+            {/* Existing Processing Payment Modal */}
+            {isProcessingPaymentModalOpen && <ProcessingPaymentModal onClose={() => setIsProcessingPaymentModalOpen(false)} potName={pot.name} colors={colors} />}
+
             <AnimatePresence>
                 {infoModalType && <InfoModal type={infoModalType} onClose={() => setInfoModalType(null)} />}
             </AnimatePresence>
@@ -771,7 +795,6 @@ export default function PotClient({
                 currentPotId={pot.id}
                 pots={relatedPots}
                 type={pot.type}
-                category={pot.category}
             />
 
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">

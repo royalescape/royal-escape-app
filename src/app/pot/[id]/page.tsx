@@ -18,8 +18,10 @@ export async function generateStaticParams() {
 
 // 2. Main Server Component
 export default async function PotPage({ params }: { params: { id: string } }) {
+    // Fix: Explicitly await the params object to ensure it's fully resolved
+    const resolvedParams = await Promise.resolve(params); // Treat params as a Promise to force resolution
     // 1. Fetch current pot data
-    const pot = await api.pots.getById(params.id);
+    const pot = await api.pots.getById(resolvedParams.id);
 
     if (!pot) {
         notFound();

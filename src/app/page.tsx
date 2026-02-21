@@ -13,7 +13,7 @@ import AuthModal from "@/components/AuthModal";
 import MyPersonalInfo from "@/components/MyPersonalInfo";
 import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
-import { User, View, PotItem } from '@/types';
+import { User, View, PotItem, PotInfo, PotType } from '@/types';
 import { api } from '@/services/api';
 import { COUPON_PRICE } from '@/lib/potData';
 
@@ -32,8 +32,8 @@ export default function RoyalEscapeHome() {
     const [currentView, setCurrentView] = useState<View>('home');
     
     // NEW STATE: For data fetching
-    const [livePots, setLivePots] = useState<PotItem[]>([]);
-    const [comingSoonPots, setComingSoonPots] = useState<PotItem[]>([]);
+    const [livePots, setLivePots] = useState<PotInfo[]>([]);
+    const [comingSoonPots, setComingSoonPots] = useState<PotInfo[]>([]);
     const [isLoadingPots, setIsLoadingPots] = useState(true);
 
     // 🚩 EFFECT: Load user state from local storage on mount (Persistence Fix)
@@ -150,8 +150,22 @@ export default function RoyalEscapeHome() {
         }
     };
 
+    const getPotIcon = (potType: PotType): string => {
+        switch (potType) {
+            case "electronics":
+                return "📱";
+            case "travel":
+                return "✈️";
+            case "financial":
+                return "💰";
+            case "default":
+            default:
+                return "🎁";
+        }
+    };
+
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: any[], comingSoonPots: any[], handlePotClick: (id: string) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
+    const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: PotInfo[], comingSoonPots: PotInfo[], handlePotClick: (id: string) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
         <>
             {/* Hero Banner / Dashboard Summary (CONDITIONALLY RENDERED) */}
             {user ? (
@@ -233,7 +247,7 @@ export default function RoyalEscapeHome() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {livePots.map(pot => (
                                 <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300 flex flex-col h-full">
-                                    <div className="text-6xl mb-4">{pot.icon}</div>
+                                    <div className="text-6xl mb-4">{getPotIcon(pot.type)}</div>
                                     <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
                                     <p className="text-gray-400 mb-3 flex-grow">{pot.description}</p>
                                     <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
@@ -272,7 +286,7 @@ export default function RoyalEscapeHome() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {comingSoonPots.map(pot => (
                                 <div key={pot.id} className="bg-gray-800/70 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
-                                    <div className="text-6xl mb-4">{pot.icon}</div>
+                                    <div className="text-6xl mb-4">{getPotIcon(pot.type)}</div>
                                     <h3 className="text-xl font-bold text-white mb-2">{pot.name}</h3>
                                     <p className="text-gray-400 mb-3">{pot.description}</p>
                                     <p className="text-yellow-400 font-semibold">{pot.prizeValue}</p>
