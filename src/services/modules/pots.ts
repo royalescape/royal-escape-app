@@ -8,9 +8,9 @@ const mapPotItem = (pot: any): PotItem => ({
 
 const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
     const closingDate = new Date(apiResponse.closing_date);
-    const startDate = new Date(apiResponse.start_date);
-    const diffTime = Math.abs(closingDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const currentDate = new Date();
+    const diffTime = closingDate.getTime() - currentDate.getTime();
+    const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
     return {
         id: apiResponse._id,
