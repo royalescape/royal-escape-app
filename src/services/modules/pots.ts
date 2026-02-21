@@ -1,11 +1,6 @@
 import { PotApiResponse, PotInfo, PotInfoResponse, PotItem, PotType } from "@/types";
 import { request } from "../core";
 
-const mapPotItem = (pot: any): PotItem => ({
-    ...pot,
-    id: pot._id || pot.id, // Fallback to existing id if _id is missing
-});
-
 const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
     const closingDate = new Date(apiResponse.closing_date);
     const currentDate = new Date();
@@ -43,7 +38,7 @@ const mapPotInfo = (pot: PotInfoResponse): PotInfo => ({
 export const potService = {
     getAll: async (): Promise<PotItem[]> => {
         const pots = await request<PotApiResponse[]>('/pots/all');
-        return pots.map(mapPotItem);
+        return pots.map(mapPotApiResponseToPotItem);
     },
     
     getActive: async (): Promise<PotInfo[]> => {
