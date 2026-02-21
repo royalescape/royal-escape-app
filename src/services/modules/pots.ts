@@ -4,8 +4,17 @@ import { request } from "../core";
 const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
     const closingDate = new Date(apiResponse.closing_date);
     const currentDate = new Date();
-    const diffTime = closingDate.getTime() - currentDate.getTime();
-    const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+    const isValidClosingDate = !isNaN(closingDate.getTime());
+
+    let diffDays = 0;
+    let formattedEndDate = '';
+
+    if (isValidClosingDate) {
+        const diffTime = closingDate.getTime() - currentDate.getTime();
+        diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+        formattedEndDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(closingDate);
+    }
 
     return {
         id: apiResponse._id,
@@ -13,17 +22,17 @@ const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
         description: apiResponse.description,
         type: apiResponse.type,
         icon: apiResponse.icon,
-        prizeValue: apiResponse.prize_amount.toLocaleString('en-US', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+        prizeValue: (apiResponse.prize_amount ?? 0).toLocaleString('en-US', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }),
         totalSlots: apiResponse.max_entries,
         filled: apiResponse.current_entries,
         remaining: apiResponse.max_entries - apiResponse.current_entries,
         daysLeft: diffDays,
-        endDate: new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(closingDate),
+        endDate: formattedEndDate,
         status: apiResponse.status,
         entryFee: apiResponse.entry_price,
         maxEntries: apiResponse.max_entries,
-        faqs: apiResponse.faq.map(item => ({ question: item.q, answer: item.a })),
-        termsAndConditions: apiResponse.terms_and_conditions,
+        faqs: apiResponse.faq?.map(item => ({ question: item.q, answer: item.a })) ?? [],
+        termsAndConditions: apiResponse.terms_and_conditions ?? [],
     };
 };
 
@@ -31,7 +40,7 @@ const mapPotInfo = (pot: PotInfoResponse): PotInfo => ({
     id: pot.id,
     description: pot.description,
     name: pot.name,
-    prizeValue: pot.prize_amount.toLocaleString('en-US', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+    prizeValue: (pot.prize_amount ?? 0).toLocaleString('en-US', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }),
     type: pot.type as PotType
 });
 

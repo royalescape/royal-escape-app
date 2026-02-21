@@ -15,7 +15,6 @@ import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
 import { User, View, PotItem, PotInfo, PotType } from '@/types';
 import { api } from '@/services/api';
-import { COUPON_PRICE } from '@/lib/potData';
 
 // --- Main Application Component ---
 export default function RoyalEscapeHome() {
@@ -408,7 +407,7 @@ export default function RoyalEscapeHome() {
                                 {
                                     step: "1",
                                     title: "Choose Your Pot",
-                                    description: `Select any of the 10 Live Luxury Pots and pay the ₹${COUPON_PRICE} entry fee.`,
+                                    description: `Select any of the 10 Live Luxury Pots and pay the entry fee.`,
                                     icon: Trophy
                                 },
                                 {

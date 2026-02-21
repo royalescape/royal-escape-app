@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PotItem, FAQItem, User, PotInfo, PotType } from "@/types";
-import { COUPON_PRICE } from '@/lib/potData';
 import { api } from "@/services/api";
 import AuthModal from "@/components/AuthModal";
 import PaymentModal from "@/components/PaymentModal"; // Import the new PaymentModal
@@ -268,7 +267,7 @@ const Confetti = () => {
 
 // Processing Payment Modal Component (renamed from PaymentModal to avoid conflict)
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-const ProcessingPaymentModal = ({ onClose, potName, colors }: any) => {
+const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClose: () => void; potName: string; colors: any; entryFee: number | undefined }) => {
     const [step, setStep] = useState<"payment" | "success">("payment");
     const [countdown, setCountdown] = useState(5);
 
@@ -327,7 +326,7 @@ const ProcessingPaymentModal = ({ onClose, potName, colors }: any) => {
                             <Loader2 className={`w-16 h-16 ${colors.text} animate-spin mx-auto mb-6`} />
                             <h2 className="text-3xl font-bold text-white mb-3">Processing Payment...</h2>
                             <p className="text-xl text-slate-300">
-                                Total Amount: <span className={`${colors.text} font-bold`}>₹{COUPON_PRICE}</span>
+                                Total Amount: <span className={`${colors.text} font-bold`}>₹{entryFee ?? 'N/A'}</span>
                             </p>
                         </div>
                     ) : (
@@ -734,7 +733,7 @@ export default function PotClient({
             )}
 
             {/* Existing Processing Payment Modal */}
-            {isProcessingPaymentModalOpen && <ProcessingPaymentModal onClose={() => setIsProcessingPaymentModalOpen(false)} potName={pot.name} colors={colors} />}
+            {isProcessingPaymentModalOpen && <ProcessingPaymentModal onClose={() => setIsProcessingPaymentModalOpen(false)} potName={pot.name} colors={colors} entryFee={pot.entryFee} />}
 
             <AnimatePresence>
                 {infoModalType && <InfoModal type={infoModalType} onClose={() => setInfoModalType(null)} />}
@@ -898,7 +897,7 @@ export default function PotClient({
                             <div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Secure Your Entry Ticket</h3>
                                 <p className="text-slate-300">
-                                    Purchase your entry for <span className="text-white font-bold">₹{COUPON_PRICE}</span> and get a chance to win the <span className="text-yellow-400 font-bold">{pot.name}</span>.
+                                    Purchase your entry for <span className="text-white font-bold">₹{pot.entryFee}</span> and get a chance to win the <span className="text-yellow-400 font-bold">{pot.name}</span>.
                                 </p>
                             </div>
 
@@ -910,7 +909,7 @@ export default function PotClient({
                             >
                                 <div className="flex items-center gap-3 justify-center">
                                     <Ticket className="w-6 h-6" />
-                                    PAY ₹{COUPON_PRICE} & JOIN
+                                    PAY ₹{pot.entryFee} & JOIN
                                 </div>
                             </motion.button>
                             
