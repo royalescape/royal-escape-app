@@ -11,7 +11,6 @@ export interface MerchItem {
     costAfterCoupon: number;
 }
 
-export type PotCategory = "gold" | "luxury" | "maldives" | "macbook" | "watch";
 export type PotType = "electronics" | "travel" | "financial" | "default";
 export type PotStatus = 'active' | 'upcoming' | 'completed' | 'cancelled' | 'ending-soon';
 
@@ -32,7 +31,6 @@ export interface PotInfo {
 }
 export interface PotItem {
     id: string;
-    category: PotCategory;
     type: PotType;
     name: string;
     icon?: string; // Added to support admin/home view simpler objects
@@ -56,7 +54,6 @@ export interface PotItem {
     gallery?: string[];
     faqs?: FAQItem[];
     termsAndConditions?: string[];
-    color?: string;
 }
 
 export interface User {
@@ -105,4 +102,24 @@ export interface SupportTicket {
     status: 'open' | 'in-progress' | 'closed';
     priority: 'low' | 'medium' | 'high';
     lastUpdated: string;
+}
+
+export interface PotApiResponse {
+    _id: string;
+    name: string;
+    description: string;
+    entry_price: number;
+    max_entries: number;
+    prize_amount: number;
+    icon: string;
+    start_date: string;
+    closing_date: string;
+    faq: { q: string; a: string; }[];
+    terms_and_conditions: string[];
+    type: PotType;
+    status: PotStatus;
+    current_entries: number;
+    winner_entry_id: string | null;
+    created_at: string;
+    updated_at: string;
 }
