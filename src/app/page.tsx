@@ -13,7 +13,8 @@ import AuthModal from "@/components/AuthModal";
 import MyPersonalInfo from "@/components/MyPersonalInfo";
 import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
-import { User, View, PotItem, PotInfo, PotType } from '@/types';
+import ImageCarousel from "@/components/ImageCarousel";
+import { User, View, PotInfo, PotType } from '@/types';
 import { api } from '@/services/api';
 
 // --- Main Application Component ---
@@ -305,11 +306,28 @@ export default function RoyalEscapeHome() {
                     )}
                 </div>
             </section>
+
+            {/* Image Carousel */}
+            {currentView === 'home' && (
+                <ImageCarousel images={[
+                   "/2.jpg",
+                   "/3.jpg",
+                   "/4.jpg",
+                   "/6.jpg",
+                   "/7.jpg",
+                   "/8.jpg",
+                   "/9.jpg",
+                   "/10.jpg",
+                   "/11.jpg",
+                ]} />
+            )}
+
         </>
     );
 
     // CORRECTED CONDITION: Only show promotional sections if the user is LOGGED OUT AND on the home view.
     const showPromotionalSections = currentView === 'home' && !user;
+    const showFAQSection = currentView === 'home';
 
 
     return (
@@ -441,7 +459,7 @@ export default function RoyalEscapeHome() {
             )}
 
             {/* FAQ Section (Always shown in original, but wrapped in component) */}
-            {showPromotionalSections && <FAQSection />}
+            {showFAQSection && <FAQSection />}
 
             {/* Footer (Always Visible) */}
             <footer className="border-t border-gray-800 bg-gray-900/50 backdrop-blur py-10 text-center">

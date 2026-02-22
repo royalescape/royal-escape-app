@@ -701,11 +701,16 @@ export default function PotClient({
     };
 
     const handlePaymentSubmission = async (upiId: string) => {
-        console.log("UPI Transaction ID submitted:", upiId);
-        // Here you would typically make an API call to verify the UPI transaction
-        // For now, simulate success and then open the processing payment modal
-        setIsPaymentModalOpen(false); // Close the new PaymentModal
-        setIsProcessingPaymentModalOpen(true); // Open the processing payment modal
+        try {
+            await api.pots.enterPot(pot.id, upiId);
+            setIsPaymentModalOpen(false); // Close the new PaymentModal
+            setIsProcessingPaymentModalOpen(true); // Open the processing payment modal
+        } catch (error) {
+            console.error("Error submitting UPI transaction:", error);
+            // Optionally, show an error message to the user
+            // For now, we'll just log it and close the payment modal
+            setIsPaymentModalOpen(false);
+        }
     };
 
     const handleProfileClick = (view: string) => {
@@ -855,30 +860,6 @@ export default function PotClient({
                         </div>
                     </motion.div>
 
-                    {/* Gallery */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-2"
-                    >
-                        <h3 className="text-2xl font-bold mb-4 text-white">Prize Gallery</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            {pot.gallery && pot.gallery.map((g, i) => (
-                                <motion.div
-                                    key={i}
-                                    whileHover={{ scale: 1.03 }}
-                                    className={`relative aspect-video group overflow-hidden rounded-xl shadow-xl border ${colors.border}`}
-                                >
-                                    <img
-                                        src={g}
-                                        alt={`${pot.name} - ${i + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                    <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
                 </div>
 
                 {/* Merchandise Section (Removed Selection Logic, Display Only if needed, or repurposed) */}

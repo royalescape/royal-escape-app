@@ -21,7 +21,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onPaymentS
         setError('');
         setIsLoading(true);
 
-        if (!upiTransactionId || upiTransactionId.length !== 12 || !/^[a-zA-Z0-9]+$/.test(upiTransactionId)) {
+        if (!upiTransactionId || upiTransactionId.length !== 12 || !/^[0-9]+$/.test(upiTransactionId)) {
             setError("Please enter a valid 12-digit UPI Transaction ID.");
             setIsLoading(false);
             return;

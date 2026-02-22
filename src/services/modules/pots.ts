@@ -77,4 +77,11 @@ export const potService = {
         const pots = await request<any[]>(`/pots`, { params: { type } });
         return pots.map(mapPotInfo);
     },
+
+    enterPot: async (potId: string, referenceId: string): Promise<void> => {
+        await request<void>(`/pots/${potId}/enter`, {
+            method: 'POST',
+            body: JSON.stringify({ 'reference_id': referenceId }),
+        });
+    },
 };

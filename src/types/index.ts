@@ -60,7 +60,7 @@ export interface User {
     id?: string; // Optional as it might not be present in simple UserType
     name?: string;
     email?: string;
-    mobile: string;
+    phone: string;
     address?: string;
     walletBalance?: number;
     status?: 'active' | 'suspended' | 'pending';
@@ -68,6 +68,7 @@ export interface User {
     totalEntries?: number;
     totalWinnings?: number;
     role?: 'user' | 'admin' | 'super-admin';
+    pinCode?: string;
 }
 
 export type View = 'home' | 'personalInfo' | 'myOrders';

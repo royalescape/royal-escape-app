@@ -156,7 +156,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             if (!name) throw new Error("Please enter your name.");
 
             // Register new user (sending empty email to reduce friction)
-            const user = await authService.register(name, "", pin);
+            await authService.register(name, "", "");
+            const user = await authService.me();
             handleSuccess(user);
         } catch (err: unknown) {
             if (err instanceof Error) {
