@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "Where your dreams come true",
 };
 
+import AuthInitializer from "@/components/AuthInitializer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthInitializer>{children}</AuthInitializer>
       </body>
     </html>
   );
