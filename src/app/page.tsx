@@ -176,31 +176,29 @@ export default function RoyalEscapeHome() {
                     <div className="max-w-7xl mx-auto text-center relative z-10">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/20 rounded-full border border-yellow-400/30 mb-6">
                             <Sparkles className="w-4 h-4 text-yellow-400" />
-                            <span className="text-sm font-semibold text-yellow-400">10 Live Luxury Pots Running Now!</span>
+                            <span className="text-sm font-semibold text-yellow-400">Pots are live. Buy your Passes Now!!</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
-                                The Ultimate Escape:{" "}
-                            </span>
+                        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tighter leading-tight">
+                            The Wait for Luxury is Over. <br />
                             <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
-                                Win Luxury & Get Free Merch
+                                Take Your Seat.
                             </span>
                         </h1>
-                        <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent font-extrabold">
-                                Secure your **Entry Ticket** and gain immediate access to exclusive benefits: A{' '}
-                                high value coupon
-                            </span>
-                            , a{' '}
-                            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent font-extrabold">
-                                FREE TICKET to win high end prizes
-                            </span>
-                            , and an{' '}
-                            <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent font-extrabold">
-                                exclusive merchandise
-                            </span>
-                            .
-                        </p>
+                        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                            Choose your Luxury Pot and secure your entry to receive an 
+                            <span className="text-white font-semibold"> instant high-value pass</span>. 
+                            One simple entry puts you in the race for 24k gold, luxury tech, and dream escapes.
+                            </p>
+
+                        {/* Optional: Add your Primary CTA Button here */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button
+                                onClick={() => openAuthModal('signin')}
+                                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-full hover:scale-105 transition-transform duration-300"
+                            >
+                                Explore Luxury Pots
+                            </button>
+                        </div>
 
                         {/* NEW: Company Boast Stats */}
                         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto text-center">
@@ -423,19 +421,19 @@ export default function RoyalEscapeHome() {
                                 {
                                     step: "1",
                                     title: "Choose Your Pot",
-                                    description: `Select any of the 10 Live Luxury Pots and pay the entry fee.`,
+                                    description: `Explore our active Luxury Pots. Pick the high-end prize that matches your style and join the hunt for the ultimate win.`,
                                     icon: Trophy
                                 },
                                 {
                                     step: "2",
-                                    title: "Select Your Merch",
-                                    description: `Your entry fee includes a coupon. Choose a merch item: get a base item FREE or pay the difference for premium.`,
+                                    title: "Buy your pass",
+                                    description: `Secure your entry in seconds. Your pass is the official golden ticket that puts your name in the race for glory.`,
                                     icon: Gift
                                 },
                                 {
                                     step: "3",
                                     title: "Win Amazing Prizes",
-                                    description: "You are now officially entered for a chance to win MacBooks, trips, gold coins, and more!",
+                                    description: "Get ready for the big reveal. From 24k gold to dream vacations, your next extraordinary win is just one draw away!",
                                     icon: Sparkles
                                 }
                             ].map((item) => (
@@ -457,20 +455,18 @@ export default function RoyalEscapeHome() {
             )}
 
             {/* FAQ Section (Always shown in original, but wrapped in component) */}
-            {showFAQSection && <FAQSection />}
+            {showFAQSection && <FAQSection user={user} openAuthModal={openAuthModal} />}
 
             {/* Footer (Always Visible) */}
             <footer className="border-t border-gray-800 bg-gray-900/50 backdrop-blur py-10 text-center">
                 <div className="flex justify-center gap-6 mb-6">
                     <a href="https://www.instagram.com/royale_escape/" target="_blank" rel="noopener noreferrer">
-                        <Instagram className="w-6 h-6 text-pink-400 hover:scale-110 transition-transform" />
+                        <Instagram className="w-8 h-8 text-pink-400 hover:scale-110 transition-transform" />
                     </a>
-                    {/* <a href="#"><Facebook className="w-6 h-6 text-blue-400 hover:scale-110 transition-transform" /></a>
-                    <a href="#"><MessageCircle className="w-6 h-6 text-sky-400 hover:scale-110 transition-transform" /></a> */}
                 </div>
                 <p className="text-gray-500 text-sm">
                     © 2025 Royal Escape. All rights reserved. |
-                    <a href="mailto:support@royalescape.club" className="hover:text-yellow-400 ml-1">support@royalescape.club</a>
+                    <a href="mailto:supportgroup@royalescape.club" className="hover:text-yellow-400 ml-1">supportgroup@royalescape.club</a>
                 </p>
             </footer>
 

@@ -43,9 +43,13 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
   return (
     <section className="py-12 bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12">
-          Our Amazing Prizes
+        <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-12">
+            Our Amazing{" "}
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Gallery
+            </span>
         </h2>
+
         <div
           ref={carouselRef}
           className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar rounded-xl shadow-lg border border-gray-700"
@@ -55,8 +59,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
               <Image
                 src={src}
                 alt={`Prize ${index + 1}`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-xl"
               />
               <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">

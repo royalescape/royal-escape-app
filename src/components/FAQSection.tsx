@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { User } from '@/types'; // Import User type
+
+// Define props for FAQSection
+interface FAQSectionProps {
+    user: User | null;
+    openAuthModal: (mode: 'signin' | 'signup') => void;
+}
 
 const faqs = [
     {
@@ -46,12 +53,24 @@ const faqs = [
         answer: "Merchandise is typically processed within 48 hours of your entry purchase and delivered within **5-7 business days** within India. You will receive a tracking number via email once your order has been shipped."
     }
 ];
-export default function FAQSection() {
+export default function FAQSection({ user, openAuthModal }: FAQSectionProps) {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleFAQ = (index: number) => {
+        if (!user) {
+            openAuthModal('signin');
+            return;
+        }
         setOpenIndex(openIndex === index ? null : index);
+    };
+
+    const handleViewAllClick = () => {
+        if (!user) {
+            openAuthModal('signin');
+        } else {
+            setIsModalOpen(true);
+        }
     };
 
     // Show only first 4 FAQs on homepage
@@ -82,15 +101,12 @@ export default function FAQSection() {
                 id="faq"
             >
                 <div className="max-w-5xl mx-auto">
-                    <motion.h2
-                        className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-12"
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        viewport={{ once: true }}
-                    >
-                        Frequently Asked Questions
-                    </motion.h2>
+                    <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-12">
+                        Frequently asked{" "}
+                        <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                            Questions
+                        </span>
+                    </h2>
 
                     <div className="space-y-5">
                         {previewFaqs.map((faq, index) => (
@@ -143,7 +159,7 @@ export default function FAQSection() {
                         viewport={{ once: true }}
                     >
                         <button
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={handleViewAllClick}
                             className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-black font-bold rounded-xl hover:shadow-2xl hover:shadow-yellow-500/25 transform hover:scale-105 transition-all duration-300 text-lg"
                         >
                             <span>View All FAQs</span>
@@ -160,7 +176,7 @@ export default function FAQSection() {
 
             {/* Full-Screen Modal */}
             <AnimatePresence>
-                {isModalOpen && (
+                {isModalOpen && user && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -245,7 +261,7 @@ export default function FAQSection() {
                                 <div className="text-center mt-8 pb-4">
                                     <p className="text-gray-400 text-sm mb-4">Still have questions?</p>
                                     <a
-                                        href="mailto:support@royalescape.club"
+                                        href="mailto:supportgroup@royalescape.club"
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-500/30 rounded-xl text-yellow-400 font-semibold hover:bg-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300"
                                     >
                                         Contact Support
