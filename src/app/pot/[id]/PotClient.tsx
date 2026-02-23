@@ -722,7 +722,7 @@ export default function PotClient({
                     isOpen={isPaymentModalOpen}
                     onClose={() => setIsPaymentModalOpen(false)}
                     onPaymentSubmit={handlePaymentSubmission}
-                    qrCodeSrc="/logo.png" // Using logo.png as placeholder for QR code
+                    qrCodeSrc="/paymentQR.png" // Using logo.png as placeholder for QR code
                 />
             )}
 
