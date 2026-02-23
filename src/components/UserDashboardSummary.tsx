@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Crown, Trophy, Gift, Sparkles } from 'lucide-react';
+import { Crown, Trophy, Sparkles } from 'lucide-react';
 import { User, View } from '@/types';
 import { api } from '@/services/api';
 

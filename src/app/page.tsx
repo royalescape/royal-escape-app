@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
-    Sparkles, Trophy, Instagram, Facebook, MessageCircle, Menu, X,
-    User as UserIcon, ListOrdered, Link, Lock, Gift, Crown, Package
+    Sparkles, Trophy, Instagram,
+    User as UserIcon, Lock, Gift, Crown, Package
 } from 'lucide-react';
 
 import FAQSection from "@/components/FAQSection";
@@ -24,7 +24,6 @@ export default function RoyalEscapeHome() {
     const [user, setUser] = useState<User | null>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
@@ -164,7 +163,6 @@ export default function RoyalEscapeHome() {
         }
     };
 
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
     const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: PotInfo[], comingSoonPots: PotInfo[], handlePotClick: (id: string) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
         <>
             {/* Hero Banner / Dashboard Summary (CONDITIONALLY RENDERED) */}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuthToken, clearAuthToken } from "@/services/core";
+import { getAuthToken } from "@/services/core";
 import { authService } from "@/services/modules/auth";
 
 interface AuthInitializerProps {

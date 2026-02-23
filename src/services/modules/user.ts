@@ -1,4 +1,4 @@
-import { User, Transaction } from "@/types";
+import { Transaction } from "@/types";
 import { mockApiCall } from "../core";
 
 export const userService = {

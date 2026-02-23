@@ -13,28 +13,19 @@ import {
     Calendar,
     Loader2,
     Coins,
-    Hotel,
     Plane,
     Laptop,
-    Watch,
     ChevronDown,
     Ticket,
     Trophy,
-    Crown,
     User as UserIcon,
-    ListOrdered,
     Lock,
-    Menu,
-    X,
-    ArrowRight,
-    QrCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PotItem, FAQItem, User, PotInfo, PotType } from "@/types";
 import { api } from "@/services/api";
 import AuthModal from "@/components/AuthModal";
 import PaymentModal from "@/components/PaymentModal"; // Import the new PaymentModal
-import { useRouter } from "next/navigation";
 
 // --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
@@ -463,7 +454,6 @@ const RoyalEscapeHeader = ({
     onSignOut: () => void;
 }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleHomeClick = () => {
         window.location.href = '/';
@@ -649,7 +639,6 @@ export default function PotClient({
     pot: PotItem;
     relatedPots: PotInfo[];
 }) {
-    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');

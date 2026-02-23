@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { User as UserIcon, Pencil, Calendar, MapPin, Check, RotateCcw } from 'lucide-react';
+import React from 'react';
+import { User as UserIcon } from 'lucide-react';
 import { User } from '@/types';
 
 interface MyPersonalInfoProps {
