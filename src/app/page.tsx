@@ -16,6 +16,7 @@ import UserDashboardSummary from "@/components/UserDashboardSummary";
 import ImageCarousel from "@/components/ImageCarousel";
 import { User, View, PotInfo, PotType } from '@/types';
 import { api } from '@/services/api';
+import Loader from "@/components/Loader";
 
 // --- Main Application Component ---
 export default function RoyalEscapeHome() {
@@ -26,6 +27,7 @@ export default function RoyalEscapeHome() {
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
     const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
 
     // NEW STATE: For internal routing
     const [currentView, setCurrentView] = useState<View>('home');
@@ -125,6 +127,7 @@ export default function RoyalEscapeHome() {
         const potUrl = `/pot/${potId}`;
 
         if (user) {
+            setIsNavigating(true); // Set loading state before navigation
             router.push(potUrl);
         } else {
             setRedirectAfterAuth(potUrl);
@@ -328,6 +331,10 @@ export default function RoyalEscapeHome() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+
+
+
+            {isNavigating && <Loader />}
             {/* Header */}
             <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

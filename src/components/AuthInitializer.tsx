@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAuthToken } from "@/services/core";
 import { authService } from "@/services/modules/auth";
+import Loader from "@/components/Loader";
 
 interface AuthInitializerProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
   }, [router]);
 
   if (loading) {
-    return <div>Loading...</div>; // Or a more sophisticated loading spinner
+    return <Loader />; 
   }
 
   return <>{children}</>;
