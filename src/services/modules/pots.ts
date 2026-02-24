@@ -79,7 +79,7 @@ export const potService = {
     },
 
     enterPot: async (potId: string, referenceId: string): Promise<void> => {
-        await request<void>(`/pots/${potId}/enter`, {
+        await request<void>(`/pots/${potId}/entry`, {
             method: 'POST',
             body: JSON.stringify({ 'quantity': 1, 'reference_id': referenceId }),
         });
