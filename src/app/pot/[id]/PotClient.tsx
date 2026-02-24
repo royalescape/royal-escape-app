@@ -794,7 +794,7 @@ export default function PotClient({
                 {/* Stats Section */}
                 <section className="mb-12">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <StatCard icon={Target} label="Total Slots" value={pot.totalSlots} colors={colors} />
+                        <StatCard icon={Target} label="Total Passes" value={pot.totalSlots} colors={colors} />
                         <StatCard icon={Users} label="Entries Filled" value={pot.filled} colors={colors} />
                         <StatCard icon={Sparkles} label="Remaining" value={pot.remaining} colors={colors} />
                         <StatCard icon={Clock} label="Days Left" value={pot.daysLeft} colors={colors} />
@@ -819,7 +819,7 @@ export default function PotClient({
                             />
                         </div>
                         <div className="text-right text-sm text-slate-300 mt-2">
-                            {pot.filled} of {pot.totalSlots} entries claimed
+                            {pot.filled} of {pot.totalSlots} passes claimed
                         </div>
                     </motion.div>
                 </section>
@@ -865,7 +865,7 @@ export default function PotClient({
                             </div>
                             
                             <div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Secure Your Entry Ticket</h3>
+                                <h3 className="text-2xl font-bold text-white mb-2">Secure Your Entry Pass</h3>
                                 <p className="text-slate-300">
                                     Purchase your entry for <span className="text-white font-bold">₹{pot.entryFee}</span> and get a chance to win the <span className="text-yellow-400 font-bold">{pot.name}</span>.
                                 </p>
