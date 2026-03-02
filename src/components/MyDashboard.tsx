@@ -108,7 +108,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                 </div>
             </div>
 
-            {/* Two Column Layout */}
+            {/* Two Column Layout for Recent Entries and Transactions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {/* Recent Entries */}
                 <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
@@ -136,43 +136,43 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         ))}
                     </div>
                 </div>
-            </div>
 
-            {/* Recent Transactions */}
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
-                    <span>Recent Transactions</span>
-                </h3>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-700">
-                        <thead>
-                            <tr className="text-left text-gray-400 text-xs uppercase tracking-wider">
-                                <th className="py-2 px-3">Pass ID</th>
-                                <th className="py-2 px-3">Description</th>
-                                <th className="py-2 px-3">Date</th>
-                                <th className="py-2 px-3 text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-700">
-                            {recentTransactions.map((txn) => (
-                                <tr key={txn.id} className="hover:bg-gray-700/30 transition-colors">
-                                    <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.id}</td>
-                                    <td className="py-3 px-3 text-sm text-gray-300">{txn.description}</td>
-                                    <td className="py-3 px-3 text-xs text-gray-400">{txn.date}</td>
-                                    <td className={`py-3 px-3 text-sm font-bold text-right ${txn.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                        {txn.amount > 0 ? '+' : ''}₹{Math.abs(txn.amount)}
-                                    </td>
+                {/* Recent Transactions */}
+                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
+                        <span>Recent Transactions</span>
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-700">
+                            <thead>
+                                <tr className="text-left text-gray-400 text-xs uppercase tracking-wider">
+                                    <th className="py-2 px-3">Pass ID</th>
+                                    <th className="py-2 px-3">Description</th>
+                                    <th className="py-2 px-3">Date</th>
+                                    <th className="py-2 px-3 text-right">Amount</th>
                                 </tr>
-                            ))}
-                            {recentTransactions.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="py-6 text-center text-gray-500">
-                                        No transactions found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-700">
+                                {recentTransactions.map((txn) => (
+                                    <tr key={txn.id} className="hover:bg-gray-700/30 transition-colors">
+                                        <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.id}</td>
+                                        <td className="py-3 px-3 text-sm text-gray-300">{txn.description}</td>
+                                        <td className="py-3 px-3 text-xs text-gray-400">{txn.date}</td>
+                                        <td className={`py-3 px-3 text-sm font-bold text-right ${txn.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            {txn.amount > 0 ? '+' : ''}₹{Math.abs(txn.amount)}
+                                        </td>
+                                    </tr>
+                                ))}
+                                {recentTransactions.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="py-6 text-center text-gray-500">
+                                            No transactions found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>

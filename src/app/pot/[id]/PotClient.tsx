@@ -413,12 +413,12 @@ const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClos
                                 className="flex justify-center gap-6 text-sm"
                             >
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-green-400 font-semibold">Payment Confirmed</span>
+                                    <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                                    <span className="text-orange-400 font-semibold">Payment Verifying..</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-green-400 font-semibold">Entry Registered</span>
+                                    <span className="text-green-400 font-semibold">Pass Confirmed!!</span>
                                 </div>
                             </motion.div>
 
