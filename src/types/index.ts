@@ -57,7 +57,7 @@ export interface PotItem {
 }
 
 export interface User {
-    id?: string; // Optional as it might not be present in simple UserType
+    _id?: string; // Optional as it might not be present in simple UserType
     name?: string;
     email?: string;
     phone: string;
@@ -103,6 +103,13 @@ export interface SupportTicket {
     status: 'open' | 'in-progress' | 'closed';
     priority: 'low' | 'medium' | 'high';
     lastUpdated: string;
+}
+
+export interface DashboardData {
+    total_entries: number;
+    confirmed_entries: number;
+    pending_entries: number;
+    total_winnings: number;
 }
 
 export interface PotApiResponse {

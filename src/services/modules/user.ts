@@ -1,17 +1,10 @@
-import { Transaction } from "@/types";
-import { mockApiCall } from "../core";
+import { DashboardData, Transaction } from "@/types";
+import { request, mockApiCall } from "../core";
 
 export const userService = {
-    getDashboardStats: async (userId: string) => {
-        // Mock dashboard stats
-        const stats = {
-            activeEntries: 5,
-            totalSpent: 1245,
-            totalWinnings: 0,
-            walletBalance: 156,
-            totalTickets: 8
-        };
-        return mockApiCall(stats);
+    getDashboardOverview: async (): Promise<DashboardData> => {
+        const response = await request<DashboardData>('/auth/me/dashboard', { method: 'GET' });
+        return response;
     },
 
     getTransactions: async (userId: string): Promise<Transaction[]> => {
