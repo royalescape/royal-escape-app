@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Trophy, Sparkles } from 'lucide-react';
+import Loader from './Loader';
 import { User, Transaction, DashboardData } from '@/types';
 import { api } from '@/services/api';
 
@@ -49,8 +50,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
     ];
 
     if (isLoading) {
-
-         return <div className="text-center py-20 text-white">Loading Dashboard...</div>;
+        return <Loader />;
     }
 
     return (
