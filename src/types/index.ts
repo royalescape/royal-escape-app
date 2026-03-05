@@ -112,6 +112,29 @@ export interface DashboardData {
     total_winnings: number;
 }
 
+export interface MyEntryEntry {
+    entry_number: number;
+    status: "confirmed" | "pending";
+    created_at: string;
+}
+
+export interface MyEntryResponse {
+    enrolled: boolean;
+    tickets: number;
+    pending_payments: number;
+    entries: MyEntryEntry[];
+}
+
+export interface PotEnrollment {
+    pot_id: string;
+    pot_name: string;
+    pot_description: string;
+    pot_status: string;
+    tickets: number;
+    amount: number;
+    enrolled_at: string;
+}
+
 export interface PotApiResponse {
     _id: string;
     name: string;

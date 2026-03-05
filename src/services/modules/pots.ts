@@ -1,4 +1,4 @@
-import { PotApiResponse, PotInfo, PotInfoResponse, PotItem, PotType } from "@/types";
+import { MyEntryResponse, PotApiResponse, PotInfo, PotInfoResponse, PotItem, PotType, PotEnrollment } from "@/types";
 import { request } from "../core";
 
 const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
@@ -83,5 +83,15 @@ export const potService = {
             method: 'POST',
             body: JSON.stringify({ 'quantity': 1, 'reference_id': referenceId }),
         });
+    },
+
+    getMyEntry: async (potId: string): Promise<MyEntryResponse> => {
+        const response = await request<MyEntryResponse>(`/pots/${potId}/my-entry`);
+        return response;
+    },
+
+    getMyEnrollments: async (): Promise<PotEnrollment[]> => {
+        const response = await request<PotEnrollment[]>('/pots/my/enrollments');
+        return response;
     },
 };

@@ -22,7 +22,7 @@ import {
     Lock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PotItem, FAQItem, User, PotInfo, PotType } from "@/types";
+import { PotItem, FAQItem, User, PotInfo, PotType, MyEntryResponse } from "@/types";
 import { api } from "@/services/api";
 import AuthModal from "@/components/AuthModal";
 import PaymentModal from "@/components/PaymentModal"; // Import the new PaymentModal
@@ -645,6 +645,7 @@ export default function PotClient({
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // For the new PaymentModal
     const [isProcessingPaymentModalOpen, setIsProcessingPaymentModalOpen] = useState(false); // For the existing processing modal
     const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | null>(null);
+    const [myEntryData, setMyEntryData] = useState<MyEntryResponse | null>(null);
 
     // Auth persistence
     useEffect(() => {
@@ -659,6 +660,22 @@ export default function PotClient({
             setUser(null);
         }
     }, []);
+
+    // Fetch user's entry data for this pot
+    useEffect(() => {
+        const fetchMyEntry = async () => {
+            if (user && pot.id) {
+                try {
+                    const response = await api.pots.getMyEntry(pot.id);
+                    setMyEntryData(response);
+                } catch (error) {
+                    console.error("Failed to fetch my entry data:", error);
+                    setMyEntryData(null);
+                }
+            }
+        };
+        fetchMyEntry();
+    }, [user, pot.id]);
 
     const handleAuthClick = (mode: 'signin' | 'signup') => {
         setAuthMode(mode);
@@ -822,6 +839,30 @@ export default function PotClient({
                             {pot.filled} of {pot.totalSlots} passes claimed
                         </div>
                     </motion.div>
+
+                    {(myEntryData && (myEntryData.tickets > 0 || myEntryData.pending_payments > 0)) && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`mt-6 p-6 bg-gradient-to-r ${colors.gradient} rounded-2xl border ${colors.border} backdrop-blur-md flex flex-col sm:flex-row justify-between items-center cursor-pointer`}
+                            onClick={() => window.location.href = '/dashboard'}
+                        >
+                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                <Ticket className={`w-8 h-8 ${colors.text}`} />
+                                <div className="text-center sm:text-left">
+                                    <h4 className="font-semibold text-white text-lg">Your Entries</h4>
+                                    <p className="text-slate-300">
+                                        You have <span className="font-bold text-white">{myEntryData.tickets}</span> confirmed {myEntryData.tickets === 1 ? 'ticket' : 'tickets'} and{" "}
+                                        <span className="font-bold text-white">{myEntryData.pending_payments}</span> pending payment {myEntryData.pending_payments === 1 ? 'confirmation' : 'confirmations'} for this pot.
+                                        <span className="block mt-2 text-xs text-blue-300 hover:underline">Click to view your entries on Dashboard</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p className="mt-4 sm:mt-0 text-sm text-yellow-400 font-semibold italic text-center sm:text-right">
+                                More entries, more chances to win! ✨
+                            </p>
+                        </motion.div>
+                    )}
                 </section>
 
                 {/* Prize Details & Gallery */}

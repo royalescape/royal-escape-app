@@ -3,21 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, Sparkles } from 'lucide-react';
 import Loader from './Loader';
-import { User, Transaction, DashboardData } from '@/types';
+import { User, DashboardData, PotEnrollment } from '@/types';
 import { api } from '@/services/api';
+import { useRouter } from 'next/navigation';
 
 interface MyDashboardProps {
     user: User;
 }
 
+const ITEMS_PER_PAGE = 5;
+const MAX_PAGES = 10;
+
 const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
+    const router = useRouter();
+
     const [dashboardOverview, setDashboardOverview] = useState<DashboardData>({
         total_entries: 0,
         confirmed_entries: 0,
         pending_entries: 0,
         total_winnings: 0,
     });
-    const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+    const [potEnrollments, setPotEnrollments] = useState<PotEnrollment[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -25,12 +32,12 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
              if (user._id) {
                  setIsLoading(true);
                  try {
-                     const [overviewData, txnData] = await Promise.all([
+                     const [overviewData, enrollmentsData] = await Promise.all([
                          api.user.getDashboardOverview(),
-                         api.user.getTransactions(user._id)
+                         api.pots.getMyEnrollments()
                      ]);
                      setDashboardOverview(overviewData);
-                     setRecentTransactions(txnData);
+                     setPotEnrollments(enrollmentsData);
                  } catch (error) {
                      console.error("Failed to fetch dashboard data", error);
                  } finally {
@@ -42,12 +49,29 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
         fetchDashboardData();
     }, [user._id]);
 
-    // Mock Data for entries/draws (can be moved to API later)
-    const recentEntries = [
-        { id: 'RE-1001', date: '2024-10-25', pot: 'MacBook Air M3', status: 'Active', drawDate: '2024-11-15', tickets: 1 },
-        { id: 'RE-1002', date: '2024-10-20', pot: 'Gold Coin', status: 'Active', drawDate: '2024-11-10', tickets: 1 },
-        { id: 'RE-1003', date: '2024-09-01', pot: 'Luxury Staycation', status: 'Active', drawDate: '2024-11-20', tickets: 2 },
-    ];
+    const sortedEnrollments = [...potEnrollments].sort((a, b) => new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime());
+
+    const recentEntries = sortedEnrollments.slice(0, 5);
+
+    const paginatedTransactions = sortedEnrollments.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const totalPages = Math.min(MAX_PAGES, Math.ceil(sortedEnrollments.length / ITEMS_PER_PAGE));
+
+    const handlePreviousPage = () => {
+        setCurrentPage((prev) => Math.max(1, prev - 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+    };
+
+    const formatStatus = (status: string) => {
+        if (!status) return "";
+        return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    };
 
     if (isLoading) {
         return <Loader />;
@@ -61,7 +85,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                     <Trophy className="inline w-8 h-8 mr-3 text-yellow-400" />
                     My Dashboard
                 </h2>
-                <p className="text-gray-400">Welcome back, {user.name?.split(' ')[0] || 'User'}! Here&apos;s your Royal Escape overview.</p>
+                <p className="text-gray-400">Welcome back, {user.name?.split(' ')[0] || 'User'}! Here's your Royal Escape overview.</p>
             </div>
 
             {/* Stats Grid */}
@@ -117,27 +141,34 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         <Trophy className="w-5 h-5 text-yellow-400" />
                     </h3>
                     <div className="space-y-3">
-                        {recentEntries.map((entry) => (
-                            <div key={entry.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <p className="font-semibold text-white">{entry.pot}</p>
-                                        <p className="text-xs text-gray-500 font-mono">{entry.id}</p>
+                        {recentEntries.length > 0 ? (
+                            recentEntries.map((entry) => (
+                                <div
+                                    key={entry.pot_id}
+                                    className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors cursor-pointer"
+                                    onClick={() => router.push(`/pot/${entry.pot_id}`)}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <p className="font-semibold text-white">{entry.pot_name}</p>
+                                        </div>
+                                        <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs font-bold rounded-full border border-green-500">
+                                            {formatStatus(entry.pot_status)}
+                                        </span>
                                     </div>
-                                    <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs font-bold rounded-full border border-green-500">
-                                        {entry.status}
-                                    </span>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">Enrolled: {new Date(entry.enrolled_at).toLocaleDateString()}</span>
+                                        <span className="text-yellow-400 font-semibold">{entry.tickets} ticket{entry.tickets > 1 ? 's' : ''}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Draw: {entry.drawDate}</span>
-                                    <span className="text-yellow-400 font-semibold">{entry.tickets} ticket{entry.tickets > 1 ? 's' : ''}</span>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-center text-gray-500">No recent entries found.</p>
+                        )}
                     </div>
                 </div>
 
-                {/* Recent Transactions */}
+                {/* Recent Transactions (now using pot enrollments) */}
                 <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
                         <span>Recent Transactions</span>
@@ -146,26 +177,27 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         <table className="min-w-full divide-y divide-gray-700">
                             <thead>
                                 <tr className="text-left text-gray-400 text-xs uppercase tracking-wider">
-                                    <th className="py-2 px-3">Pass ID</th>
-                                    <th className="py-2 px-3">Description</th>
+                                    <th className="py-2 px-3">Pot Name</th>
+                                    <th className="py-2 px-3">Tickets</th>
                                     <th className="py-2 px-3">Date</th>
                                     <th className="py-2 px-3 text-right">Amount</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
-                                {recentTransactions.map((txn) => (
-                                    <tr key={txn.id} className="hover:bg-gray-700/30 transition-colors">
-                                        <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.id}</td>
-                                        <td className="py-3 px-3 text-sm text-gray-300">{txn.description}</td>
-                                        <td className="py-3 px-3 text-xs text-gray-400">{txn.date}</td>
-                                        <td className={`py-3 px-3 text-sm font-bold text-right ${txn.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {txn.amount > 0 ? '+' : ''}₹{Math.abs(txn.amount)}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {recentTransactions.length === 0 && (
+                                {paginatedTransactions.length > 0 ? (
+                                    paginatedTransactions.map((txn) => (
+                                        <tr key={txn.pot_id} className="hover:bg-gray-700/30 transition-colors">
+                                            <td className="py-3 px-3 text-sm text-gray-300">{txn.pot_name}</td>
+                                            <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.tickets}</td>
+                                            <td className="py-3 px-3 text-xs text-gray-400">{new Date(txn.enrolled_at).toLocaleDateString()}</td>
+                                            <td className="py-3 px-3 text-sm font-bold text-right text-yellow-400">
+                                                {txn.amount}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
                                     <tr>
-                                        <td colSpan={5} className="py-6 text-center text-gray-500">
+                                        <td colSpan={4} className="py-6 text-center text-gray-500">
                                             No transactions found.
                                         </td>
                                     </tr>
@@ -173,6 +205,25 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                             </tbody>
                         </table>
                     </div>
+                    {totalPages > 1 && (
+                        <div className="flex justify-between items-center mt-4">
+                            <button
+                                onClick={handlePreviousPage}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:opacity-50"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-gray-300">Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={handleNextPage}
+                                disabled={currentPage === totalPages}
+                                className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
