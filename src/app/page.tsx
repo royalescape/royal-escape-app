@@ -2,37 +2,28 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import {
-    Sparkles, Trophy, Instagram,
-    User as UserIcon, Lock, Gift, Crown, Package
+    Sparkles, Trophy, Gift, Crown, Package, User as UserIcon
 } from 'lucide-react';
 
 import FAQSection from "@/components/FAQSection";
-import AuthModal from "@/components/AuthModal";
-import MyPersonalInfo from "@/components/MyPersonalInfo";
-import MyDashboard from "@/components/MyDashboard";
 import UserDashboardSummary from "@/components/UserDashboardSummary";
 import ImageCarousel from "@/components/ImageCarousel";
-import { User, View, PotInfo, PotType } from '@/types';
+import { User, PotInfo, PotType } from '@/types';
 import { api } from '@/services/api';
-import Loader from "@/components/Loader";
+import BaseLayout from '@/components/BaseLayout'; // Import BaseLayout
 
 // --- Main Application Component ---
 export default function RoyalEscapeHome() {
     const router = useRouter();
 
     const [user, setUser] = useState<User | null>(null);
-    const [isAuthOpen, setIsAuthOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-    const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
-    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-    const [isNavigating, setIsNavigating] = useState(false);
+    const [isAuthOpen, setIsAuthOpen] = useState(false); // Kept here as it's passed to BaseLayout
+    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin'); // Kept here as it's passed to BaseLayout
+    const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null); // Kept here as it's passed to BaseLayout
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false); // Kept here as it's passed to BaseLayout
+    const [isNavigating, setIsNavigating] = useState(false); // Kept here as it's passed to BaseLayout
 
-    // NEW STATE: For internal routing
-    const [currentView, setCurrentView] = useState<View>('home');
-    
-    // NEW STATE: For data fetching
     const [livePots, setLivePots] = useState<PotInfo[]>([]);
     const [comingSoonPots, setComingSoonPots] = useState<PotInfo[]>([]);
     const [isLoadingPots, setIsLoadingPots] = useState(true);
@@ -75,6 +66,7 @@ export default function RoyalEscapeHome() {
     }, []);
 
 
+    // These functions are now passed to BaseLayout
     const openAuthModal = useCallback((mode: 'signin' | 'signup') => {
         setAuthMode(mode);
         setIsAuthOpen(true);
@@ -85,19 +77,6 @@ export default function RoyalEscapeHome() {
         setRedirectAfterAuth(null);
     }, []);
 
-    // 🚩 UPDATED: Handle view change and close dropdown
-    const handleViewChange = useCallback((view: View) => {
-        setCurrentView(view);
-        setIsProfileDropdownOpen(false);
-        if (view === 'home') {
-            // Usually we stay on the same route for SPA feel, or push '/'
-            // router.push('/'); // Optional: Update URL if you want deep linking support for views later
-        } else {
-            console.log(`Navigating to ${view} view...`);
-        }
-    }, []);
-
-    // UPDATED: Save user to localStorage on success
     const handleAuthSuccess = useCallback((authenticatedUser: User) => {
         setUser(authenticatedUser);
         localStorage.setItem('royalEscapeUser', JSON.stringify(authenticatedUser));
@@ -106,20 +85,18 @@ export default function RoyalEscapeHome() {
         if (redirectAfterAuth) {
             router.push(redirectAfterAuth);
         }
-    }, [closeAuthModal, redirectAfterAuth, router]);
+    }, [closeAuthModal, redirectAfterAuth, router, setUser]);
 
-    // UPDATED: Clear persistence on sign out
     const handleSignOut = useCallback(async () => {
         try {
             await api.auth.logout();
             setUser(null);
             console.log("User signed out.");
             setIsProfileDropdownOpen(false);
-            setCurrentView('home'); // Go back to home view
         } catch (error) {
             console.error("Logout failed:", error);
         }
-    }, []);
+    }, [setUser]);
 
 
     // FUNCTION: Handles click on a Pot, checks authentication, and redirects
@@ -132,23 +109,6 @@ export default function RoyalEscapeHome() {
         } else {
             setRedirectAfterAuth(potUrl);
             openAuthModal('signin');
-        }
-    };
-
-    // --- Conditional Rendering based on View State ---
-
-    const renderContent = () => {
-        if (!user) return <HomeViewContent user={null} handleViewChange={handleViewChange} livePots={livePots} comingSoonPots={comingSoonPots} handlePotClick={handlePotClick} />;
-
-        switch (currentView) {
-            case 'personalInfo':
-                return <MyPersonalInfo user={user} />;
-            case 'myOrders':
-                return <MyDashboard user={user} />;
-            case 'home':
-            default:
-                // Home view content, which handles the Hero/Summary swap internally
-                return <HomeViewContent user={user} handleViewChange={handleViewChange} livePots={livePots} comingSoonPots={comingSoonPots} handlePotClick={handlePotClick} />;
         }
     };
 
@@ -166,12 +126,17 @@ export default function RoyalEscapeHome() {
         }
     };
 
-    const HomeViewContent: React.FC<{ user: User | null, handleViewChange: (view: View) => void, livePots: PotInfo[], comingSoonPots: PotInfo[], handlePotClick: (id: string) => void }> = ({ user, handleViewChange, livePots, comingSoonPots, handlePotClick }) => (
-        <>
-            {/* Hero Banner / Dashboard Summary (CONDITIONALLY RENDERED) */}
+    return (
+        <BaseLayout
+            user={user}
+            setUser={setUser}
+            isNavigating={isNavigating}
+            setIsNavigating={setIsNavigating}
+        >
+            {/* Main Content Render */}
             {user ? (
-                // LOGGED IN: User Dashboard Summary
-                <UserDashboardSummary user={user} handleViewChange={handleViewChange} />
+                // LOGGED IN: User Dashboard Summary - remains on home page
+                <UserDashboardSummary user={user} />
             ) : (
                 // LOGGED OUT: Promotional Hero Banner
                 <section className="relative py-12 px-4 overflow-hidden">
@@ -188,10 +153,10 @@ export default function RoyalEscapeHome() {
                             </span>
                         </h1>
                         <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                            Choose your Luxury Pot and secure your entry to receive an 
-                            <span className="text-white font-semibold"> instant high-value pass</span>. 
+                            Choose your Luxury Pot and secure your entry to receive an
+                            <span className="text-white font-semibold"> instant high-value pass</span>.
                             One simple entry puts you in the race for 24k gold, luxury tech, and dream escapes.
-                            </p>
+                        </p>
 
                         {/* Optional: Add your Primary CTA Button here */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -241,7 +206,7 @@ export default function RoyalEscapeHome() {
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
                         Live <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Pots</span>
                     </h2>
-                    
+
                     {livePots.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {livePots.map(pot => (
@@ -280,7 +245,7 @@ export default function RoyalEscapeHome() {
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-10">
                         Coming <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Soon</span>
                     </h2>
-                    
+
                     {comingSoonPots.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {comingSoonPots.map(pot => (
@@ -306,116 +271,25 @@ export default function RoyalEscapeHome() {
                 </div>
             </section>
 
+
             {/* Image Carousel */}
-            {currentView === 'home' && (
-                <ImageCarousel images={[
-                   "/1.jpg",
-                   "/2.jpg",
-                   "/3.jpg",
-                   "/4.jpg",
-                   "/5.jpg",
-                   "/6.jpg",
-                   "/7.jpg",
-                   "/8.jpg",
-                   "/9.jpg",
-                   "/10.jpg",
-                   "/11.jpg",
-                ]} />
-            )}
-
-        </>
-    );
-
-    // CORRECTED CONDITION: Only show promotional sections if the user is LOGGED OUT AND on the home view.
-    const showPromotionalSections = currentView === 'home' && !user;
-    const showFAQSection = currentView === 'home';
-
-
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-
-
-
-            {isNavigating && <Loader />}
-            {/* Header */}
-            <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        {/* Logo - Flex grow allows it to take available space, shrinking buttons on mobile if needed */}
-                        <div className="flex items-center gap-2 cursor-pointer flex-shrink-0 mr-4" onClick={() => handleViewChange('home')}>
-                            <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center p-0.5 overflow-hidden flex-shrink-0">
-                                <Image 
-                                    src="/logo.png" 
-                                    alt="Royal Escape Logo" 
-                                    width={40} 
-                                    height={40} 
-                                    className="w-full h-full object-cover rounded-full"
-                                />
-                            </div>
-                            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent truncate max-w-[150px] sm:max-w-none">
-                                Royal Escape
-                            </span>
-                        </div>
-
-                        {/* Right Side Buttons */}
-                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                            {user ? (
-                                <>
-                                    {/* Profile Dropdown */}
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setIsProfileDropdownOpen(prev => !prev)}
-                                            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400 text-sm sm:text-base"
-                                        >
-                                            {user.name?.charAt(0).toUpperCase() || 'U'}
-                                        </button>
-
-                                        {isProfileDropdownOpen && (
-                                            <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
-                                                <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-700 truncate">
-                                                    Hi, {user.name?.split(' ')[0] || 'User'} 
-                                                </div>
-                                                <button
-                                                    onClick={() => handleViewChange('personalInfo')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center border-b border-gray-700 pb-2 mb-2"
-                                                >
-                                                    <UserIcon className="w-4 h-4 mr-2" /> My Personal Info
-                                                </button>
-                                                <button
-                                                    onClick={handleSignOut}
-                                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <Lock className="w-4 h-4 mr-2" /> Sign Out
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            ) : (
-                                // Login/Register Buttons (for logged out users)
-                                <>
-                                    <button
-                                        onClick={() => openAuthModal('signin')}
-                                        className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap"
-                                    >
-                                        LOGIN
-                                    </button>
-                                </>
-                            )}
-
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* Main Content Render */}
-            <main className="min-h-[calc(100vh-64px-100px)]">
-                {renderContent()}
-            </main>
+            <ImageCarousel images={[
+                "/1.jpg",
+                "/2.jpg",
+                "/3.jpg",
+                "/4.jpg",
+                "/5.jpg",
+                "/6.jpg",
+                "/7.jpg",
+                "/8.jpg",
+                "/9.jpg",
+                "/10.jpg",
+                "/11.jpg",
+            ]} />
 
             {/* How It Works Section (CONDITIONALLY RENDERED) */}
-            {/* FINAL FIX: Only render if `showPromotionalSections` is true (i.e., NOT logged in AND on home) */}
-            {showPromotionalSections && (
+            {/* Only render if NOT logged in */}
+            {!user && (
                 <section id="how-it-works" className="py-16 px-4">
                     <div className="max-w-5xl mx-auto">
                         <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-12">
@@ -436,7 +310,7 @@ export default function RoyalEscapeHome() {
                                 {
                                     step: "2",
                                     title: "Buy your pass",
-                                    description: `Secure your entry in seconds. Your pass is the official golden ticket that puts your name in the race for glory.`,
+                                    description: `Secure your entry in seconds. Your pass is the official golden ticket that puts your name in the race for glory.`, 
                                     icon: Gift
                                 },
                                 {
@@ -463,29 +337,8 @@ export default function RoyalEscapeHome() {
                 </section>
             )}
 
-            {/* FAQ Section (Always shown in original, but wrapped in component) */}
-            {showFAQSection && <FAQSection user={user} openAuthModal={openAuthModal} />}
-
-            {/* Footer (Always Visible) */}
-            <footer className="border-t border-gray-800 bg-gray-900/50 backdrop-blur py-10 text-center">
-                <div className="flex justify-center gap-6 mb-6">
-                    <a href="https://www.instagram.com/royale_escape/" target="_blank" rel="noopener noreferrer">
-                        <Instagram className="w-8 h-8 text-pink-400 hover:scale-110 transition-transform" />
-                    </a>
-                </div>
-                <p className="text-gray-500 text-sm">
-                    © 2025 Royal Escape. All rights reserved. |
-                    <a href="mailto:supportgroup@royalescape.club" className="hover:text-yellow-400 ml-1">supportgroup@royalescape.club</a>
-                </p>
-            </footer>
-
-            {/* Auth Modal */}
-            <AuthModal
-                isOpen={isAuthOpen}
-                onClose={closeAuthModal}
-                initialMode={authMode}
-                onAuthSuccess={handleAuthSuccess}
-            />
-        </div>
+            {/* FAQ Section (Always shown on home) */}
+            <FAQSection user={user} openAuthModal={openAuthModal} />
+        </BaseLayout>
     );
 }

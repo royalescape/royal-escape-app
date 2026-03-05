@@ -2,15 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { Crown, Trophy, Sparkles } from 'lucide-react';
-import { User, View, DashboardData } from '@/types';
+import { User, DashboardData } from '@/types';
 import { api } from '@/services/api';
+import { useRouter } from 'next/navigation';
 
 interface UserDashboardSummaryProps {
     user: User;
-    handleViewChange: (view: View) => void;
 }
 
-const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handleViewChange }) => {
+const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user }) => {
+    const router = useRouter();
+
     // New State for stats
     const [stats, setStats] = useState<{
         confirmed_entries: number;
@@ -61,7 +63,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                 {/* Summary Stats Grid - Added onClick and styling to each stat block */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                     <div
-                        onClick={() => handleViewChange('myOrders')}
+                        onClick={() => router.push('/dashboard')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
                     >
                         <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-2" />
@@ -69,7 +71,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                         <p className="text-xs text-gray-400">Confirmed Entries</p>
                     </div>
                     <div
-                        onClick={() => handleViewChange('myOrders')}
+                        onClick={() => router.push('/dashboard')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
                     >
                         <Sparkles className="w-6 h-6 text-orange-400 mx-auto mb-2" />
@@ -77,7 +79,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                         <p className="text-xs text-gray-400">Pending Entries</p>
                     </div>
                     <div
-                        onClick={() => handleViewChange('myOrders')}
+                        onClick={() => router.push('/dashboard')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
                     >
                         <Trophy className="w-6 h-6 text-green-400 mx-auto mb-2" />
@@ -85,7 +87,7 @@ const UserDashboardSummary: React.FC<UserDashboardSummaryProps> = ({ user, handl
                         <p className="text-xs text-gray-400">Total Entries</p>
                     </div>
                     <div
-                        onClick={() => handleViewChange('myOrders')}
+                        onClick={() => router.push('/dashboard')}
                         className="p-4 bg-gray-800/70 rounded-xl border border-yellow-400/30 cursor-pointer hover:bg-gray-700/70 transition-colors"
                     >
                         <Sparkles className="w-6 h-6 text-yellow-400 mx-auto mb-2" />

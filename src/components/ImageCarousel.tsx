@@ -63,9 +63,6 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
                 style={{ objectFit: 'cover' }}
                 className="rounded-xl"
               />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                <p className="text-white text-2xl font-bold">Prize {index + 1}</p>
-              </div>
             </div>
           ))}
         </div>
