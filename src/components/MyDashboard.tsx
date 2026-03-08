@@ -51,7 +51,8 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
 
     const sortedEnrollments = [...potEnrollments].sort((a, b) => new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime());
 
-    const recentEntries = sortedEnrollments.slice(0, 5);
+    // Filter recent entries by ticket_status: "confirmed" and take the first 5
+    const recentEntries = sortedEnrollments.filter(entry => entry.ticket_status === "confirmed").slice(0, 5);
 
     const paginatedTransactions = sortedEnrollments.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
@@ -71,6 +72,10 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
     const formatStatus = (status: string) => {
         if (!status) return "";
         return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    };
+
+    const formatTicketNumber = (ticketNumber: string) => {
+        return `RE-${String(ticketNumber).padStart(3, '0')}`;
     };
 
     if (isLoading) {
@@ -144,26 +149,26 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         {recentEntries.length > 0 ? (
                             recentEntries.map((entry) => (
                                 <div
-                                    key={entry.pot_id}
+                                    key={entry.ticket_number}
                                     className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors cursor-pointer"
                                     onClick={() => router.push(`/pot/${entry.pot_id}`)}
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
                                             <p className="font-semibold text-white">{entry.pot_name}</p>
+                                            <p className="text-xs text-gray-500 font-mono">{formatTicketNumber(entry.ticket_number)}</p>
                                         </div>
                                         <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs font-bold rounded-full border border-green-500">
-                                            {formatStatus(entry.pot_status)}
+                                            {formatStatus(entry.ticket_status)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">Enrolled: {new Date(entry.enrolled_at).toLocaleDateString()}</span>
-                                        <span className="text-yellow-400 font-semibold">{entry.tickets} ticket{entry.tickets > 1 ? 's' : ''}</span>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center text-gray-500">No recent entries found.</p>
+                            <p className="text-center text-gray-500">No confirmed entries found.</p>
                         )}
                     </div>
                 </div>
@@ -178,20 +183,20 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                             <thead>
                                 <tr className="text-left text-gray-400 text-xs uppercase tracking-wider">
                                     <th className="py-2 px-3">Pot Name</th>
-                                    <th className="py-2 px-3">Tickets</th>
+                                    <th className="py-2 px-3">Ticket Number</th>
                                     <th className="py-2 px-3">Date</th>
-                                    <th className="py-2 px-3 text-right">Amount</th>
+                                    <th className="py-2 px-3 text-right">Cost</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
                                 {paginatedTransactions.length > 0 ? (
                                     paginatedTransactions.map((txn) => (
-                                        <tr key={txn.pot_id} className="hover:bg-gray-700/30 transition-colors">
+                                        <tr key={txn.ticket_number} className="hover:bg-gray-700/30 transition-colors">
                                             <td className="py-3 px-3 text-sm text-gray-300">{txn.pot_name}</td>
-                                            <td className="py-3 px-3 text-xs font-mono text-gray-400">{txn.tickets}</td>
+                                            <td className="py-3 px-3 text-xs font-mono text-gray-400">{formatTicketNumber(txn.ticket_number)}</td>
                                             <td className="py-3 px-3 text-xs text-gray-400">{new Date(txn.enrolled_at).toLocaleDateString()}</td>
                                             <td className="py-3 px-3 text-sm font-bold text-right text-yellow-400">
-                                                {txn.amount}
+                                                ₹{txn.cost}
                                             </td>
                                         </tr>
                                     ))

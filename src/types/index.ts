@@ -130,9 +130,10 @@ export interface PotEnrollment {
     pot_name: string;
     pot_description: string;
     pot_status: string;
-    tickets: number;
-    amount: number;
+    ticket_status: string;
+    ticket_number: string;
     enrolled_at: string;
+    cost: number;
 }
 
 export interface PotApiResponse {
