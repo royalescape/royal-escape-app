@@ -13,45 +13,49 @@ interface FAQSectionProps {
 
 const faqs = [
     {
-        question: "1. How does Royal Escape work?",
-        answer: "Royal Escape is a luxury reward platform where you purchase an entry into a prize draw and receive a merchandise gift. The flow is simple: 1. **Choose** one of the 10 Live Luxury Pots you wish to win. 2. **Pay** the entry fee of **₹249**. 3. **Select** your free or discounted merchandise gift to complete the purchase. You are then entered into the draw."
+        question: "1. Is Royal Escape legal?",
+        answer: "Yes. Royal Escape operates as a **promotional contest model** where participants enter by purchasing an entry pass. It is not a lottery or betting platform."
     },
     {
-        question: "2. What is the fixed cost of an entry?",
-        answer: "The entry fee for any single Live Luxury Pot is fixed at **₹249**. This payment covers your entry into the specific draw and doubles as a **₹249 coupon** to be used immediately towards your merchandise selection."
+        question: "2. Is this gambling or betting?",
+        answer: "No.\nThere are **no odds, predictions, or betting mechanics involved**. Participants simply purchase an entry pass to participate in a promotional draw."
     },
     {
-        question: "3. What do I receive with my ₹249 Entry Ticket?",
-        answer: "Your ₹249 purchase secures two things: 1. **One unique entry** into the specific Luxury Pot draw you selected. 2. **A ₹249 coupon** that you must apply to a merch item. This makes our base merchandise items free, or provides a significant discount on premium items."
+        question: "3. How does the pot system work?",
+        answer: "Each contest pot has a **fixed number of entry slots.**\nParticipants buy entry passes to fill the pot. Once all slots are filled, a **live draw is conducted to select the winner.**"
     },
     {
-        question: "4. How does the Free/Discounted Merch Gift work?",
-        answer: "Your ₹249 entry acts as a coupon applied instantly to the merchandise: **Free Items:** Merch priced at ₹249 or less is free (₹0 additional cost). **Discounted Items:** For premium merch (e.g., a hoodie priced at ₹1499), you only pay the additional amount above the coupon value (e.g., ₹1499 - ₹249 = ₹1250 additional cost)."
+        question: "4. What happens if I don’t win?",
+        answer: "The entry pass fee is a **participation fee**, similar to entering a contest or event.\nIt does not guarantee winning."
     },
     {
-        question: "5. Can I buy entries for multiple pots?",
-        answer: "Yes, absolutely! You can purchase multiple entry tickets by selecting different Live Pots. Each separate ₹249 entry ticket gives you one unique chance to win the corresponding prize, increasing your overall odds across the draws."
+        question: "5. How is the winner selected?",
+        answer: "The winner is selected through a **transparent live draw** conducted after the pot is completely filled."
     },
     {
-        question: "6. How are the winners of the luxury pots selected?",
-        answer: "Winners are selected through a transparent and verifiable random draw system. Every entry is assigned a unique ticket number, and winners are drawn fairly using a verified selection process. All draws are conducted with complete transparency."
+        question: "6. What does the Goa trip include?",
+        answer: "The winner receives a **Goa travel package**, which includes travel arrangements and accommodation stay.\nComplete details will be shared with the winner after the draw."
     },
     {
-        question: "7. What prizes are currently available to win?",
-        answer: "Our 10 Live Luxury Pots are prominently displayed on the homepage. Prizes typically include high-value items like MacBooks, all-inclusive luxury trips (Maldives, Dubai), Gold Coins, the latest iPhones, and other premium rewards. The value of each pot is clearly listed."
+        question: "7. What does the Iphone dream include?",
+        answer: "The winner receives the latest Iphone 17 Pro from Apple."
     },
     {
-        question: "8. Is this legal and safe?",
-        answer: "Yes, Royal Escape operates legally. The core transaction is the purchase of a product (the merchandise gift, acquired via the coupon/entry fee), and the entry into the luxury reward draw is given as an associated promotional offer. We adhere to all regulatory requirements and ensure complete transparency."
+        question: "8. Are the winners real?",
+        answer: "Yes. Previous winners and draw highlights are shared on the Royal Escape social channels"
     },
     {
-        question: "9. How will I know if I win?",
-        answer: "Winners are notified immediately via **email, phone, and SMS**. We also announce winners publicly on our social media platforms and website. You will receive detailed, personal instructions on how to securely claim your prize within 24 hours of the draw."
+        question: "9. Is my payment secure?",
+        answer: "Yes.\nAll payments are processed through a **secure payment gateway** on the official platform.\nRoyal Escape does not accept payments through WhatsApp or unofficial channels."
     },
     {
-        question: "10. What is the delivery time for the merchandise I select?",
-        answer: "Merchandise is typically processed within 48 hours of your entry purchase and delivered within **5-7 business days** within India. You will receive a tracking number via email once your order has been shipped."
-    }
+        question: "10. Can I participate multiple times?",
+        answer: "Yes. Participants may purchase multiple entry passes if available in the pot.\nEach entry pass counts as one participation slot."
+    },
+    {
+        question: "11. Can Royal Escape cancel a pot?",
+        answer: "In rare operational situations, Royal Escape reserves the right to cancel or modify a pot.\nParticipants will be notified accordingly."
+    },
 ];
 export default function FAQSection({ user, openAuthModal }: FAQSectionProps) {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -84,12 +88,21 @@ export default function FAQSection({ user, openAuthModal }: FAQSectionProps) {
                 // Remove the asterisks and apply the highlight class
                 const content = part.slice(2, -2);
                 return (
-                    <span key={index} className="text-yellow-400 font-semibold">
+                    <span key={index} className="font-semibold">
                         {content}
                     </span>
                 );
             }
-            return <span key={index}>{part}</span>;
+            return (
+                <span key={index}>
+                    {part.split('\n').map((line, i, arr) => (
+                        <span key={i}>
+                            {line}
+                            {i < arr.length - 1 && <br />}
+                        </span>
+                    ))}
+                </span>
+            );
         });
     };
 

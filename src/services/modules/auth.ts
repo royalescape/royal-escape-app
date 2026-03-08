@@ -19,7 +19,7 @@ export const authService = {
         }
         return response;
     },
-
+ 
     sendOtp: async (mobile: string): Promise<{ success: boolean; message: string }> => {
         return request<{ success: boolean; message: string }>('/auth/otp/send', {
             method: 'POST',
