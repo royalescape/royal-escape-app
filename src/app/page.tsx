@@ -132,6 +132,11 @@ export default function RoyalEscapeHome() {
             setUser={setUser}
             isNavigating={isNavigating}
             setIsNavigating={setIsNavigating}
+            isAuthOpen={isAuthOpen}
+            authMode={authMode}
+            openAuthModal={openAuthModal}
+            closeAuthModal={closeAuthModal}
+            onAuthSuccess={handleAuthSuccess}
         >
             {/* Main Content Render */}
             {user ? (

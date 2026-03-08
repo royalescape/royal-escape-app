@@ -19,27 +19,61 @@ interface BaseLayoutProps {
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
     isNavigating: boolean;
     setIsNavigating: React.Dispatch<React.SetStateAction<boolean>>;
+    // Optional props for controlled state (from parent)
+    isAuthOpen?: boolean;
+    authMode?: 'signin' | 'signup';
+    openAuthModal?: (mode: 'signin' | 'signup') => void;
+    closeAuthModal?: () => void;
+    onAuthSuccess?: (user: User) => void;
 }
 
-const BaseLayout: React.FC<BaseLayoutProps> = ({ children, user, setUser, isNavigating, setIsNavigating }) => {
+const BaseLayout: React.FC<BaseLayoutProps> = ({ 
+    children, 
+    user, 
+    setUser, 
+    isNavigating, 
+    setIsNavigating,
+    // Destructure optional props
+    isAuthOpen: propsIsAuthOpen,
+    authMode: propsAuthMode,
+    openAuthModal: propsOpenAuthModal,
+    closeAuthModal: propsCloseAuthModal,
+    onAuthSuccess: propsOnAuthSuccess
+}) => {
     const router = useRouter();
 
-    const [isAuthOpen, setIsAuthOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+    // Internal state for when not controlled by parent
+    const [internalIsAuthOpen, setInternalIsAuthOpen] = useState(false);
+    const [internalAuthMode, setInternalAuthMode] = useState<'signin' | 'signup'>('signin');
     const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
+    // Determine if state is controlled
+    const isControlled = propsIsAuthOpen !== undefined;
+
+    // Use props if controlled, otherwise internal state
+    const isAuthOpen = isControlled ? propsIsAuthOpen : internalIsAuthOpen;
+    const authMode = (isControlled && propsAuthMode) ? propsAuthMode : internalAuthMode;
+
     const openAuthModal = useCallback((mode: 'signin' | 'signup') => {
-        setAuthMode(mode);
-        setIsAuthOpen(true);
-    }, []);
+        if (isControlled && propsOpenAuthModal) {
+            propsOpenAuthModal(mode);
+        } else {
+            setInternalAuthMode(mode);
+            setInternalIsAuthOpen(true);
+        }
+    }, [isControlled, propsOpenAuthModal]);
 
     const closeAuthModal = useCallback(() => {
-        setIsAuthOpen(false);
-        setRedirectAfterAuth(null);
-    }, []);
+        if (isControlled && propsCloseAuthModal) {
+            propsCloseAuthModal();
+        } else {
+            setInternalIsAuthOpen(false);
+            setRedirectAfterAuth(null);
+        }
+    }, [isControlled, propsCloseAuthModal]);
 
-    const handleAuthSuccess = useCallback((authenticatedUser: User) => {
+    const internalHandleAuthSuccess = useCallback((authenticatedUser: User) => {
         setUser(authenticatedUser);
         localStorage.setItem('royalEscapeUser', JSON.stringify(authenticatedUser));
         closeAuthModal();
@@ -48,6 +82,8 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ children, user, setUser, isNavi
             router.push(redirectAfterAuth);
         }
     }, [closeAuthModal, redirectAfterAuth, router, setUser]);
+
+    const handleAuthSuccess = (isControlled && propsOnAuthSuccess) ? propsOnAuthSuccess : internalHandleAuthSuccess;
 
     const handleSignOut = useCallback(async () => {
         try {
