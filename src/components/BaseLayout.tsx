@@ -103,11 +103,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({
 
     const navigateToPersonalInfo = () => {
         setIsNavigating(true);
-        // Assuming MyPersonalInfo is meant to be a component on the home page or a modal,
-        // if it were a route, we would do router.push('/personal-info')
-        // For now, it stays as a component on home if it's not a separate route.
-        // If it's a modal, it would be handled differently.
-        // For this task, we assume it's part of the home page as a component.
+        router.push('/personal-info');
     };
 
     return (
