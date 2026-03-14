@@ -54,17 +54,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             const checkResult = await authService.checkMobile(mobile);
             setIsNewUser(!checkResult.exists);
 
-            if (checkResult.pin_required) {
+            if (checkResult.exists) {
                 // User exists and pin is set, move to PIN verification
                 setStep(3);
             } else {
-                // User needs OTP (new user or existing user fallback)
-                // Only send OTP if we are strictly in the OTP flow logic?
-                // The prompt says "else we show the OTP flow".
-                // Usually check-user might just check. We still need to trigger send-otp if we go to step 2.
-                // Assuming check-user does NOT send OTP automatically.
-                await authService.sendOtp(mobile);
-                setStep(2);
+                // User does not exist, move to Set PIN directly (OTP flow removed)
+                setStep(3);
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -113,22 +108,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 throw new Error("Please enter a valid 4-digit PIN.");
             }
 
-            if (isOtpVerified) {
-                await authService.setPin(pin);
-                
-                if (isNewUser) {
-                    setStep(4);
-                    return;
-                }
-
-                const user = await authService.me();
-                handleSuccess(user);
-                return;
-            }
-
             if (isNewUser) {
-                // Should not reach here if coming from OTP flow,
-                // but if manual flow handling exists:
+                // New user setting PIN - proceed to name input without API call
                 setStep(4);
             } else {
                 // Existing user logging in
@@ -155,9 +136,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         try {
             if (!name) throw new Error("Please enter your name.");
 
-            // Register new user (sending empty email to reduce friction)
-            await authService.register(name, "", "");
-            const user = await authService.me();
+            // Register new user
+            const user = await authService.register(name, mobile, pin);
             handleSuccess(user);
         } catch (err: unknown) {
             if (err instanceof Error) {

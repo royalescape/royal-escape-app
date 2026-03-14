@@ -2,8 +2,8 @@ import { User } from "@/types";
 import { request, setAuthToken, clearAuthToken } from "../core";
 
 export const authService = {
-    checkMobile: async (mobile: string): Promise<{ exists: boolean; pin_required: boolean; otp_required: boolean }> => {
-        return request<{ exists: boolean; pin_required: boolean; otp_required: boolean }>('/auth/check-user', {
+    checkMobile: async (mobile: string): Promise<{ exists: boolean; registeration_required: boolean }> => {
+        return request<{ exists: boolean; registeration_required: boolean }>('/auth/check-user', {
             method: 'POST',
             body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}` }),
         });
@@ -53,15 +53,21 @@ export const authService = {
         });
     },
 
-    register: async (name: string, email: string, pin: string): Promise<User> => {
-        return request<User>('/auth/register', {
+    register: async (name: string, phone: string, pin: string): Promise<User> => {
+        const response = await request<{ message: string; token: string }>('/auth/register', {
             method: 'POST',
             body: JSON.stringify({
                 name,
-                email,
-                pincode: pin
+                phone: phone.startsWith('+91') ? phone : `+91${phone}`,
+                pin
             }),
         });
+
+        if (response.token) {
+            setAuthToken(response.token);
+        }
+
+        return authService.me();
     },
 
     logout: async (): Promise<void> => {

@@ -149,7 +149,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                         {recentEntries.length > 0 ? (
                             recentEntries.map((entry) => (
                                 <div
-                                    key={entry.ticket_number}
+                                    key={`${entry.pot_id}-${entry.ticket_number}`}
                                     className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors cursor-pointer"
                                     onClick={() => router.push(`/pot/${entry.pot_id}`)}
                                 >
@@ -191,7 +191,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                             <tbody className="divide-y divide-gray-700">
                                 {paginatedTransactions.length > 0 ? (
                                     paginatedTransactions.map((txn) => (
-                                        <tr key={txn.ticket_number} className="hover:bg-gray-700/30 transition-colors">
+                                        <tr key={`${txn.pot_id}-${txn.ticket_number}`} className="hover:bg-gray-700/30 transition-colors">
                                             <td className="py-3 px-3 text-sm text-gray-300">{txn.pot_name}</td>
                                             <td className="py-3 px-3 text-xs font-mono text-gray-400">{formatTicketNumber(txn.ticket_number)}</td>
                                             <td className="py-3 px-3 text-xs text-gray-400">{new Date(txn.enrolled_at).toLocaleDateString()}</td>
