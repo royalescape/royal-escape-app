@@ -167,7 +167,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                                     <input
                                         type="tel"
                                         value={mobile}
-                                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                                        onChange={(e) => {
+                                            setMobile(e.target.value.replace(/\D/g, ''));
+                                            setError('');
+                                        }}
                                         placeholder="9876543210"
                                         maxLength={10}
                                         className="w-full p-3 pl-20 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150"

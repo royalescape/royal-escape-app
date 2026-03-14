@@ -311,7 +311,7 @@ const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClos
                     />
                 )}
 
-                <div className="relative z-10 p-8 md:p-12">
+                <div className="relative z-10 p-6 sm:p-8 md:p-12">
                     {step === "payment" ? (
                         <div className="text-center">
                             <Loader2 className={`w-16 h-16 ${colors.text} animate-spin mx-auto mb-6`} />
@@ -353,7 +353,7 @@ const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClos
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-2"
+                                    className="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-2"
                                 >
                                     ENTRY SECURED!
                                 </motion.h2>
@@ -361,7 +361,7 @@ const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClos
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className="text-3xl font-bold text-white flex items-center justify-center gap-2"
+                                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white flex flex-wrap items-center justify-center gap-2"
                                 >
                                     CONGRATULATIONS!
                                     <span className="inline-block animate-bounce">🎉</span>
