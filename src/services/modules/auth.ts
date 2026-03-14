@@ -19,13 +19,6 @@ export const authService = {
         }
         return response;
     },
- 
-    sendOtp: async (mobile: string): Promise<{ success: boolean; message: string }> => {
-        return request<{ success: boolean; message: string }>('/auth/otp/send', {
-            method: 'POST',
-            body: JSON.stringify({ phone: mobile.startsWith('+91') ? mobile : `+91${mobile}` }),
-        });
-    },
 
     validateOtp: async (mobile: string, otp: string): Promise<{ registration_token?: string }> => {
         const response = await request<{ registration_token?: string }>('/auth/otp/verify', {
@@ -43,13 +36,6 @@ export const authService = {
     me: async (): Promise<User> => {
         return request<User>('/auth/me', {
             method: 'GET',
-        });
-    },
-
-    setPin: async (pin: string): Promise<{ success: boolean; message: string }> => {
-        return request<{ success: boolean; message: string }>('/auth/set-pin', {
-            method: 'POST',
-            body: JSON.stringify({ pin }),
         });
     },
 

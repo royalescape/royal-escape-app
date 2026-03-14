@@ -11,16 +11,14 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess }) => {
-    // Steps: 1. Phone Input, 2. OTP Verification, 3. PIN Verification (if user exists) or PIN Set (if new), 4. Name Input (if new)
-    const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+    // Steps: 1. Phone Input, 2. PIN Verification (if user exists) or PIN Set (if new), 3. Name Input (if new)
+    const [step, setStep] = useState<1 | 2 | 3>(1);
     const [mobile, setMobile] = useState('');
-    const [otp, setOtp] = useState('');
     const [pin, setPin] = useState('');
     const [name, setName] = useState('');
     
     // Auth State
     const [isNewUser, setIsNewUser] = useState(false);
-    const [isOtpVerified, setIsOtpVerified] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
@@ -30,13 +28,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         if (isOpen) {
             setStep(1);
             setMobile('');
-            setOtp('');
             setPin('');
             setName('');
             setError('');
             setIsSuccess(false);
             setIsNewUser(false);
-            setIsOtpVerified(false);
         }
     }, [isOpen]);
 
@@ -56,42 +52,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
             if (checkResult.exists) {
                 // User exists and pin is set, move to PIN verification
-                setStep(3);
+                setStep(2);
             } else {
                 // User does not exist, move to Set PIN directly (OTP flow removed)
-                setStep(3);
+                setStep(2);
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setError(err.message);
             } else {
                 setError("Failed to verify mobile number.");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleOtpSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setIsLoading(true);
-
-        try {
-            if (!otp || otp.length < 4) {
-                throw new Error("Please enter a valid OTP.");
-            }
-
-            await authService.validateOtp(mobile, otp);
-            
-            // If validation doesn't throw, it's successful
-            setIsOtpVerified(true);
-            setStep(3);
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("Invalid OTP.");
             }
         } finally {
             setIsLoading(false);
@@ -110,7 +80,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
             if (isNewUser) {
                 // New user setting PIN - proceed to name input without API call
-                setStep(4);
+                setStep(3);
             } else {
                 // Existing user logging in
                 await authService.loginWithPin(mobile, pin);
@@ -174,15 +144,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                     <Crown className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
                     <h2 className="text-2xl font-bold text-white mb-2">
                         {step === 1 && "Welcome to Royal Escape"}
-                        {step === 2 && "Verify Your Number"}
-                        {step === 3 && (isNewUser || isOtpVerified ? "Set Your Security PIN" : "Enter Security PIN")}
-                        {step === 4 && "One Last Thing"}
+                        {step === 2 && (isNewUser ? "Set Your Security PIN" : "Enter Security PIN")}
+                        {step === 3 && "One Last Thing"}
                     </h2>
                     <p className="text-gray-400 text-sm">
                         {step === 1 && "Enter your mobile number to continue."}
-                        {step === 2 && `We've sent a code to +91 ${mobile}`}
-                        {step === 3 && (isNewUser || isOtpVerified ? "Create a 4-digit PIN for your account." : "Enter your 4-digit PIN to access your account.")}
-                        {step === 4 && "What should we call you?"}
+                        {step === 2 && (isNewUser ? "Create a 4-digit PIN for your account." : "Enter your 4-digit PIN to access your account.")}
+                        {step === 3 && "What should we call you?"}
                     </p>
                 </div>
 
@@ -213,34 +181,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                     )}
 
                     {step === 2 && (
-                        <form onSubmit={handleOtpSubmit}>
-                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-300 mb-2">Enter OTP</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-                                    <input
-                                        type="text"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="123456"
-                                        maxLength={6}
-                                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition duration-150 text-center tracking-[0.5em] font-mono text-lg"
-                                        autoFocus
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <Button isLoading={isLoading} text="Verify OTP" />
-                            <div className="mt-4 text-center">
-                                <button type="button" onClick={() => setStep(1)} className="text-sm text-yellow-500 hover:text-yellow-400">Change Mobile Number</button>
-                            </div>
-                        </form>
-                    )}
-
-                    {step === 3 && (
                         <form onSubmit={handlePinSubmit}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-300 mb-2">{isNewUser || isOtpVerified ? 'Set PIN' : 'Enter PIN'}</label>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">{isNewUser ? 'Set PIN' : 'Enter PIN'}</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                                     <input
@@ -255,14 +198,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                                     />
                                 </div>
                             </div>
-                            <Button isLoading={isLoading} text={isNewUser || isOtpVerified ? "Set PIN" : "Login"} />
+                            <Button isLoading={isLoading} text={isNewUser ? "Set PIN" : "Login"} />
                              <div className="mt-4 text-center">
                                 <button type="button" onClick={() => setStep(1)} className="text-sm text-yellow-500 hover:text-yellow-400">Back</button>
                             </div>
                         </form>
                     )}
 
-                    {step === 4 && (
+                    {step === 3 && (
                         <form onSubmit={handleProfileSubmit}>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -311,4 +254,3 @@ const Button = ({ isLoading, text }: { isLoading: boolean, text: string }) => (
 );
 
 export default AuthModal;
-
