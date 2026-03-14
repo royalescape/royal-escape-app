@@ -51,12 +51,12 @@ export const potService = {
     },
     
     getActive: async (): Promise<PotInfo[]> => {
-        const pots = await request<PotInfoResponse[]>('/pots?status=active');
+        const pots = await request<PotInfoResponse[]>('/pots/?status=active');
         return pots.map(mapPotInfo);
     },
 
     getUpcoming: async (): Promise<PotInfo[]> => {
-        const pots = await request<PotInfoResponse[]>('/pots?status=upcoming');
+        const pots = await request<PotInfoResponse[]>('/pots/?status=upcoming');
         return pots.map(mapPotInfo);
     },
 
