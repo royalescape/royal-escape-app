@@ -583,7 +583,7 @@ const InfoModal = ({
             note: 'Visit the main dashboard to edit your personal information.'
         }
     };
-    
+
     const content = modalContent[type];
     const IconComponent = content.icon;
 
@@ -739,7 +739,7 @@ export default function PotClient({
                     isOpen={isPaymentModalOpen}
                     onClose={() => setIsPaymentModalOpen(false)}
                     onPaymentSubmit={handlePaymentSubmission}
-                    qrCodeSrc="/paymentQR.png" // Using logo.png as placeholder for QR code
+                    qrCodeSrc={`/${pot.entryFee}.png`}
                 />
             )}
 
@@ -898,13 +898,13 @@ export default function PotClient({
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-6">
                         Enter the Draw
                     </h2>
-                    
-                     <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-8 border border-slate-700 max-w-2xl mx-auto backdrop-blur-md">
+
+                    <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-8 border border-slate-700 max-w-2xl mx-auto backdrop-blur-md">
                         <div className="flex flex-col items-center gap-6">
                             <div className="p-4 bg-yellow-400/10 rounded-full border border-yellow-400/30">
                                 <Ticket className="w-12 h-12 text-yellow-400" />
                             </div>
-                            
+
                             <div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Secure Your Entry Pass</h3>
                                 <p className="text-slate-300">
@@ -923,7 +923,7 @@ export default function PotClient({
                                     PAY ₹{pot.entryFee} & JOIN
                                 </div>
                             </motion.button>
-                            
+
                             <p className="text-xs text-slate-500">
                                 * By proceeding, you agree to our Terms & Conditions.
                             </p>
