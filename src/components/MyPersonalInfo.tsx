@@ -10,10 +10,10 @@ interface MyPersonalInfoProps {
 
 const MyPersonalInfo: React.FC<MyPersonalInfoProps> = ({ user }) => {
     const formData = {
-        fullName: user.name,
-        email: user.email,
-        mobile: user.phone,
-        pinCode: user.pinCode
+        fullName: user.name || "",
+        email: user.email || "",
+        mobile: user.phone || "",
+        pinCode: user.pinCode || ""
     };
 
     const inputClasses = "w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-yellow-500 transition-colors placeholder-gray-500";
