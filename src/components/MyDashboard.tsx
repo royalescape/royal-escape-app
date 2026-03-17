@@ -75,7 +75,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
     };
 
     const formatTicketNumber = (ticketNumber: string) => {
-        return `RE-${String(ticketNumber).padStart(3, '0')}`;
+        return `RE-${String(ticketNumber).padStart(5, '0')}`;
     };
 
     if (isLoading) {
