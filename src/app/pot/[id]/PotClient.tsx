@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
     Users,
     Clock,
@@ -18,14 +17,13 @@ import {
     ChevronDown,
     Ticket,
     Trophy,
-    User as UserIcon,
-    Lock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PotItem, FAQItem, User, PotInfo, PotType, MyEntryResponse } from "@/types";
 import { api } from "@/services/api";
 import AuthModal from "@/components/AuthModal";
 import PaymentModal from "@/components/PaymentModal"; // Import the new PaymentModal
+import Header from "@/components/Header";
 
 // --- Reusing these since they are specific to this page's presentation ---
 // Icon Map
@@ -441,196 +439,6 @@ const ProcessingPaymentModal = ({ onClose, potName, colors, entryFee }: { onClos
     );
 };
 
-// Royal Escape Header Component (Matches Homepage)
-const RoyalEscapeHeader = ({
-    user,
-    onProfileClick,
-    onAuthClick,
-    onSignOut
-}: {
-    user: User | null;
-    onProfileClick?: (view: string) => void;
-    onAuthClick: (mode: 'signin' | 'signup') => void;
-    onSignOut: () => void;
-}) => {
-    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-
-    const handleHomeClick = () => {
-        window.location.href = '/';
-    };
-
-    const handleProfileOption = (view: string) => {
-        setIsProfileDropdownOpen(false);
-        if (onProfileClick) {
-            onProfileClick(view);
-        } else {
-            window.location.href = `/?view=${view}`;
-        }
-    };
-
-    const handleSignOut = () => {
-        setIsProfileDropdownOpen(false);
-        onSignOut();
-    };
-
-    return (
-        <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
-                    <button
-                        onClick={handleHomeClick}
-                        className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0 mr-4"
-                    >
-                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center p-0.5 overflow-hidden flex-shrink-0">
-                            <Image
-                                src="/logo.png"
-                                alt="Royal Escape Logo"
-                                width={40}
-                                height={40}
-                                className="w-full h-full object-cover rounded-full"
-                            />
-                        </div>
-                        <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent truncate max-w-[150px] sm:max-w-none">
-                            Royal Escape
-                        </span>
-                    </button>
-
-                    {/* Right Side Buttons */}
-                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                        {user ? (
-                            <>
-                                {/* Profile Dropdown */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setIsProfileDropdownOpen(prev => !prev)}
-                                        className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 text-black font-bold rounded-full transition-all hover:ring-2 hover:ring-yellow-400 text-sm sm:text-base"
-                                    >
-                                        {user.name?.charAt(0).toUpperCase() || 'U'}
-                                    </button>
-
-                                    {isProfileDropdownOpen && (
-                                        <>
-                                            {/* Backdrop to close dropdown */}
-                                            <div
-                                                className="fixed inset-0 z-40"
-                                                onClick={() => setIsProfileDropdownOpen(false)}
-                                            />
-
-                                            {/* Dropdown Menu */}
-                                            <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
-                                                <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-700 truncate">
-                                                    Hi, <strong>{user.name?.split(' ')[0] || 'User'}</strong>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleProfileOption('personalInfo')}
-                                                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center border-b border-gray-700 pb-2 mb-2"
-                                                >
-                                                    <UserIcon className="w-4 h-4 mr-2" /> My Personal Info
-                                                </button>
-                                                <button
-                                                    onClick={handleSignOut}
-                                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center"
-                                                >
-                                                    <Lock className="w-4 h-4 mr-2" /> Sign Out
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            // Login/Register Buttons (for logged out users)
-                            <>
-                                <button
-                                    onClick={() => onAuthClick('signin')}
-                                    className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg shadow-md hover:shadow-yellow-400/40 transition-all text-sm sm:text-base whitespace-nowrap"
-                                >
-                                    LOGIN
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </header>
-    );
-};
-
-// Info Modal Component for Wallet and Profile Views
-const InfoModal = ({
-    type,
-    onClose
-}: {
-    type: 'wallet' | 'dashboard' | 'personalInfo' | null;
-    onClose: () => void;
-}) => {
-    if (!type || type === 'wallet') return null;
-
-    const modalContent = {
-        dashboard: {
-            title: 'My Dashboard',
-            icon: Trophy,
-            color: 'blue',
-            message: 'View all your active entries, upcoming draws, and transaction history.',
-            note: 'Visit the main dashboard for complete overview of your Royal Escape activity.'
-        },
-        personalInfo: {
-            title: 'My Personal Info',
-            icon: UserIcon,
-            color: 'purple',
-            message: 'Update your profile information, contact details, and preferences.',
-            note: 'Visit the main dashboard to edit your personal information.'
-        }
-    };
-
-    const content = modalContent[type];
-    const IconComponent = content.icon;
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
-            onClick={onClose}
-        >
-            <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 shadow-2xl border-2 border-gray-700"
-            >
-                <div className="text-center">
-                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-${content.color}-500/20 flex items-center justify-center`}>
-                        <IconComponent className={`w-8 h-8 text-${content.color}-400`} />
-                    </div>
-                    <h2 className="text-2xl font-bold text-white mb-3">{content.title}</h2>
-                    <p className="text-lg text-slate-300 mb-4">{content.message}</p>
-                    <p className="text-sm text-slate-400 mb-6 p-3 bg-slate-800/50 rounded-lg">
-                        💡 {content.note}
-                    </p>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onClose}
-                            className="flex-1 px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors"
-                        >
-                            Continue Here
-                        </button>
-                        <button
-                            onClick={() => window.location.href = `/?view=${type === 'dashboard' ? 'myOrders' : type}`}
-                            className={`flex-1 px-6 py-3 bg-gradient-to-r from-${content.color}-500 to-${content.color}-600 text-white font-bold rounded-lg hover:shadow-lg transition-all`}
-                        >
-                            Go to Dashboard
-                        </button>
-                    </div>
-                </div>
-            </motion.div>
-        </motion.div>
-    );
-};
-
 // Main Component
 export default function PotClient({
     pot,
@@ -644,7 +452,6 @@ export default function PotClient({
     const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // For the new PaymentModal
     const [isProcessingPaymentModalOpen, setIsProcessingPaymentModalOpen] = useState(false); // For the existing processing modal
-    const [infoModalType, setInfoModalType] = useState<'wallet' | 'dashboard' | 'personalInfo' | null>(null);
     const [myEntryData, setMyEntryData] = useState<MyEntryResponse | null>(null);
 
     // Auth persistence
@@ -719,14 +526,6 @@ export default function PotClient({
         }
     };
 
-    const handleProfileClick = (view: string) => {
-        const modalMap: Record<string, 'dashboard' | 'personalInfo'> = {
-            'myOrders': 'dashboard',
-            'personalInfo': 'personalInfo',
-        };
-        setInfoModalType(modalMap[view]);
-    };
-
     const filledPercent = ((pot.filled / pot.totalSlots) * 100).toFixed(1);
     const PotIcon = IconMap[pot.type] || IconMap.default;
     const colors = getColorClasses(pot.type);
@@ -746,10 +545,6 @@ export default function PotClient({
             {/* Existing Processing Payment Modal */}
             {isProcessingPaymentModalOpen && <ProcessingPaymentModal onClose={() => setIsProcessingPaymentModalOpen(false)} potName={pot.name} colors={colors} entryFee={pot.entryFee} />}
 
-            <AnimatePresence>
-                {infoModalType && <InfoModal type={infoModalType} onClose={() => setInfoModalType(null)} />}
-            </AnimatePresence>
-
             <AuthModal
                 isOpen={isAuthOpen}
                 onClose={() => setIsAuthOpen(false)}
@@ -757,10 +552,9 @@ export default function PotClient({
                 onAuthSuccess={handleAuthSuccess}
             />
 
-            {/* Royal Escape Header */}
-            <RoyalEscapeHeader
+            {/* Shared Header */}
+            <Header
                 user={user}
-                onProfileClick={handleProfileClick}
                 onAuthClick={handleAuthClick}
                 onSignOut={handleSignOut}
             />

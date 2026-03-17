@@ -29,21 +29,21 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
-             if (user._id) {
-                 setIsLoading(true);
-                 try {
-                     const [overviewData, enrollmentsData] = await Promise.all([
-                         api.user.getDashboardOverview(),
-                         api.pots.getMyEnrollments()
-                     ]);
-                     setDashboardOverview(overviewData);
-                     setPotEnrollments(enrollmentsData);
-                 } catch (error) {
-                     console.error("Failed to fetch dashboard data", error);
-                 } finally {
-                     setIsLoading(false);
-                 }
-             }
+            if (user._id) {
+                setIsLoading(true);
+                try {
+                    const [overviewData, enrollmentsData] = await Promise.all([
+                        api.user.getDashboardOverview(),
+                        api.pots.getMyEnrollments()
+                    ]);
+                    setDashboardOverview(overviewData);
+                    setPotEnrollments(enrollmentsData);
+                } catch (error) {
+                    console.error("Failed to fetch dashboard data", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
         };
 
         fetchDashboardData();
@@ -74,8 +74,17 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
         return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
     };
 
-    const formatTicketNumber = (ticketNumber: string) => {
-        return `RE-${String(ticketNumber).padStart(5, '0')}`;
+    const formatTicketNumber = (ticketNumber: string, potName: string) => {
+        const initials = potName
+            .trim()
+            .toUpperCase()
+            .replace(/[^A-Z0-9 ]/g, '')   // strip special chars
+            .split(' ')
+            .map(word => word.slice(0, 2)) // take first 2 chars of each word
+            .join('')
+            .slice(0, 4);                  // max 4 chars total
+
+        return `RE-${initials}-${String(ticketNumber).padStart(5, '0')}`;
     };
 
     if (isLoading) {
@@ -156,7 +165,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
                                             <p className="font-semibold text-white">{entry.pot_name}</p>
-                                            <p className="text-xs text-gray-500 font-mono">{formatTicketNumber(entry.ticket_number)}</p>
+                                            <p className="text-xs text-gray-500 font-mono">{formatTicketNumber(entry.ticket_number, entry.pot_name)}</p>
                                         </div>
                                         <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs font-bold rounded-full border border-green-500">
                                             {formatStatus(entry.ticket_status)}
@@ -193,7 +202,7 @@ const MyDashboard: React.FC<MyDashboardProps> = ({ user }) => {
                                     paginatedTransactions.map((txn) => (
                                         <tr key={`${txn.pot_id}-${txn.ticket_number}`} className="hover:bg-gray-700/30 transition-colors">
                                             <td className="py-3 px-3 text-sm text-gray-300">{txn.pot_name}</td>
-                                            <td className="py-3 px-3 text-xs font-mono text-gray-400">{formatTicketNumber(txn.ticket_number)}</td>
+                                            <td className="py-3 px-3 text-xs font-mono text-gray-400">{formatTicketNumber(txn.ticket_number, txn.pot_name)}</td>
                                             <td className="py-3 px-3 text-xs text-gray-400">{new Date(txn.enrolled_at).toLocaleDateString()}</td>
                                             <td className="py-3 px-3 text-sm font-bold text-right text-yellow-400">
                                                 ₹{txn.cost}
