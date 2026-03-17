@@ -1,4 +1,4 @@
-import { MyEntryResponse, PotApiResponse, PotInfo, PotInfoResponse, PotItem, PotType, PotEnrollment } from "@/types";
+import { MyEntryResponse, PotApiResponse, PotInfo, PotInfoResponse, PotItem, PotType, PotEnrollment, PotStatus } from "@/types";
 import { request } from "../core";
 
 const mapPotApiResponseToPotItem = (apiResponse: PotApiResponse): PotItem => {
@@ -72,9 +72,8 @@ export const potService = {
         }
     },
 
-    getByType: async (type: PotType): Promise<PotInfo[]> => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pots = await request<any[]>(`/pots`, { params: { type } });
+    getByTypeAndStatus: async (type: PotType, status: PotStatus = 'active'): Promise<PotInfo[]> => {
+        const pots = await request<PotInfoResponse[]>(`/pots`, { params: { type, status } });
         return pots.map(mapPotInfo);
     },
 

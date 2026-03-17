@@ -17,7 +17,7 @@ export default async function PotPage({ params }: { params: { id: string } }) {
     }
 
     // 2. Fetch all related pots based on the pot's new 'type'
-    const relatedPots = await api.pots.getByType(pot.type);
+    const relatedPots = await api.pots.getByTypeAndStatus(pot.type);
 
     // Render the Client Component and pass the fetched data as a prop
     return (

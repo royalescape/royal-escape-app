@@ -212,7 +212,11 @@ export default function RoyalEscapeHome() {
                         Live <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Pots</span>
                     </h2>
 
-                    {livePots.length > 0 ? (
+                    {isLoadingPots ? (
+                         <div className="flex justify-center items-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+                         </div>
+                    ) : livePots.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {livePots.map(pot => (
                                 <div key={pot.id} className="bg-gray-800/80 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300 flex flex-col h-full">
@@ -251,7 +255,11 @@ export default function RoyalEscapeHome() {
                         Coming <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Soon</span>
                     </h2>
 
-                    {comingSoonPots.length > 0 ? (
+                    {isLoadingPots ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+                        </div>
+                    ) : comingSoonPots.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {comingSoonPots.map(pot => (
                                 <div key={pot.id} className="bg-gray-800/70 rounded-2xl p-6 border border-gray-700 hover:border-yellow-400 transition-all duration-300">
