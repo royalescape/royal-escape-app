@@ -274,7 +274,7 @@ export default function FAQSection({ user, openAuthModal }: FAQSectionProps) {
                                 <div className="text-center mt-8 pb-4">
                                     <p className="text-gray-400 text-sm mb-4">Still have questions?</p>
                                     <a
-                                        href="mailto:supportgroup@royalescape.club"
+                                        href="mailto:support@royalescape.club"
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-500/30 rounded-xl text-yellow-400 font-semibold hover:bg-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300"
                                     >
                                         Contact Support

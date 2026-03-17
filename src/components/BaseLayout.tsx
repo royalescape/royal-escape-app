@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
-    User as UserIcon, Lock
+    User as UserIcon, Lock, Mail
 } from 'lucide-react';
 import { Instagram } from 'lucide-react';
 
@@ -131,6 +131,15 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({
 
                         {/* Right Side Buttons */}
                         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                            {/* Support Email Icon */}
+                            <a 
+                                href="mailto:support@royalescape.club" 
+                                className="flex items-center justify-center text-gray-300 hover:text-yellow-400 transition-colors mr-1 sm:mr-2"
+                                aria-label="Contact Support"
+                            >
+                                <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </a>
+
                             {user ? (
                                 <>
                                     {/* Profile Dropdown */}
@@ -199,7 +208,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({
                 </div>
                 <p className="text-gray-500 text-sm">
                     © 2025 Royal Escape. All rights reserved. |
-                    <a href="mailto:supportgroup@royalescape.club" className="hover:text-yellow-400 ml-1">supportgroup@royalescape.club</a>
+                    <a href="mailto:support@royalescape.club" className="hover:text-yellow-400 ml-1">support@royalescape.club</a>
                 </p>
             </footer>
 
