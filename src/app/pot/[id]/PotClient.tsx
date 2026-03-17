@@ -874,15 +874,10 @@ export default function PotClient({
                         className={`lg:col-span-1 p-8 bg-gradient-to-br ${colors.gradient} rounded-2xl border ${colors.border} backdrop-blur-md shadow-xl`}
                     >
                         <div className="flex items-center mb-6">
-                            <Gift className={`w-8 h-8 ${colors.text} mr-3`} />
-                            <h2 className="text-2xl font-bold text-white">Prize Includes</h2>
+                            <Calendar className={`w-8 h-8 ${colors.text} mr-3`} />
+                            <h2 className="text-2xl font-bold text-white">Draw Date</h2>
                         </div>
-                        <ul className="space-y-3">
-                            {pot.prizeDetails && pot.prizeDetails.map((d, idx) => (
-                                <FeatureItem key={idx} icon={CheckCircle} text={d} colors={colors} />
-                            ))}
-                        </ul>
-                        <div className={`mt-6 p-4 bg-slate-900/40 rounded-xl border border-slate-700`}>
+                        <div className={`p-4 bg-slate-900/40 rounded-xl border border-slate-700`}>
                             <div className="flex items-center gap-2 text-slate-300">
                                 <Calendar className={`w-5 h-5 ${colors.text}`} />
                                 <span className="text-sm">Entry Cut-off: <strong className="text-white">{pot.endDate}</strong></span>
@@ -892,7 +887,6 @@ export default function PotClient({
 
                 </div>
 
-                {/* Merchandise Section (Removed Selection Logic, Display Only if needed, or repurposed) */}
                 {/* Simplified Purchase Section */}
                 <section id="purchase" className="mb-16 text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-6">
